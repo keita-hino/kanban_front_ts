@@ -1,30 +1,38 @@
 <template>
   <v-app id="inspire">
+    <Header/>
     <div class="container">
       <router-view/>
     </div>
   </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+  import Header from '@/components/Header'
+  // import SideBar from './components/SideBar'
+  // import Store from './store'
 
-#nav {
-  padding: 30px;
-}
+  export default {
+    data: function () {
+      return {
+      }
+    },
+    components: {
+      Header
+    },
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+    methods:{
+      // ログインしているか
+      // isLogined() {
+      //   return Store.state.auth.email != null
+      // },
+    },
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+    mounted(){
+      // if(Store.state.auth.email == null && this.$route.name != 'Login'){
+      //   this.$router.push({name: 'Login'})
+      // }
+    },
+
+  }
+</script>

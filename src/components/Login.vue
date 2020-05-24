@@ -51,6 +51,8 @@
 </template>
 
 <script>
+  // TODO:最上位で読み込んで注入するようにする
+  import axios from 'axios'
   export default {
     data() {
       return {
@@ -61,13 +63,13 @@
     methods: {
       // ログイン
       login() {
-        this.axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
+        axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
           .then(response => {
             // TODO:ログイン失敗した場合の処理追加
             const data = {
               user: response.data.data
             }
-            this.$store.commit('auth/login', data);
+            this.$store.commit('auth/login', data.user);
             this.$store.commit('workspace/setWorkspace', response.data.workspace);
             this.$router.push({name: 'Tasks'});
           });
