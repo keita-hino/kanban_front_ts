@@ -3,7 +3,7 @@ import { Workspace } from '@/store/types';
 export default {
   namespaced: true,
   mutations: {
-    setWorkspace: function (state: Workspace, data: Workspace) {
+    setWorkspace: (state: Workspace, data: Workspace) => {
       state.id = data.id;
       state.name = data.name;
     },
