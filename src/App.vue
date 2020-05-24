@@ -1,32 +1,48 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app id="inspire">
+    <template v-if="!isLogined()">
+      <Header/>
+      <div class="container">
+        <router-view/>
+      </div>
+    </template>
+
+    <SideBar v-else-if="isLogined()">
+      <Header/>
+      <div class="container">
+        <router-view/>
+      </div>
+    </SideBar>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+  import Header from '@/components/Header'
+  import SideBar from '@/components/SideBar'
+  import Store from '@/store'
 
-#nav {
-  padding: 30px;
-}
+  export default {
+    data: function () {
+      return {
+      }
+    },
+    components: {
+      Header,
+      SideBar
+    },
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+    methods:{
+      // ログインしているか
+      isLogined() {
+        return Store.state.auth.email != null
+      },
+    },
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+    mounted(){
+      if(Store.state.auth.email == null && this.$route.name != 'Login'){
+        this.$router.push({name: 'Login'})
+      }
+    },
+
+  }
+</script>
