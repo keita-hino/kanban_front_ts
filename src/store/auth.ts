@@ -3,6 +3,7 @@ import { Auth } from '@/store/types';
 export default {
   namespaced: true,
   mutations: {
+    // TODO:stateの方も同じ型にしているが合っているかあとで確認
     login: (state: Auth, data: Auth) =>  {
       state.email = data.email;
       state.last_name = data.last_name;
