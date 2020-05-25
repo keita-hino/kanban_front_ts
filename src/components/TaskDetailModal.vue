@@ -71,65 +71,63 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="$emit('on-click-task-detail-cancel')">キャンセル</v-btn>
-          <v-btn class="save" color="blue darken-1" text @click="onClickSave()" :disabled="isConserve()">保存</v-btn>
+          <v-btn class="save" color="blue darken-1" text @click="onClickSave(selectedTask)" :disabled="!!$refs.task_form && !$refs.task_form.validate()">保存</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TaskDetailModal',
-    props: {
-      // タスク表示/非表示
-      isTaskDetailModalShow: {
-        type: Boolean,
-      },
-      // タスクのステータス
-      taskStatus: {
-        type: String,
-      },
-      // タスクの優先度のenum
-      priorities: {
-        type: Array
-      },
-      // 選択されたタスク
-      selectedTask: {
-        type: Object,
-      },
-      // ステータス{key: i18n}
-      statuses: {
-        type: Object,
-      }
-    },
+<script lang="ts">
+  import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+  import { TaskData } from '@/types/task';
 
-    data() {
-      return {
-        task: {},
-        menu2: false,
-        nameRules: [
-          v => !!v || 'タスク名は必須です',
-          v => v.length <= 50 || 'タスク名は50字以内で入力してください',
-        ],
-        detailRules: [
-          // TODO:オプショナルチェイニング使うとエラーになるので調査
-          v => v.length <= 200 || !v || '詳細は200字以内で入力してください'
-        ]
-      }
-    },
+  @Component
+  export default class TaskDetailModal extends Vue {
+    @Prop()
+    // タスク表示/非表示
+    public isTaskDetailModalShow?: boolean;
 
-    methods: {
-      // 登録されているタスクを取得する
-      onClickSave() {
-        this.task.status = this.taskStatus;
-        this.$emit('on-click-task-detail-save', this.selectedTask);
-      },
+    @Prop()
+    // タスクのステータス
+    public taskStatus?: string;
 
-      // バーリデーションエラーがないか
-      isConserve(){
-        return !!this.$refs.task_form && !this.$refs.task_form.validate();
-      }
+    @Prop()
+    // タスクの優先度のenum
+    public priorities?: object[];
+
+    @Prop()
+    // 選択されたタスク
+    public selectedTask?: TaskData;
+
+    @Prop()
+    // ステータス{key: i18n}
+    public statuses?: object;
+
+    // TODO:定義ファイル作成
+    public task: TaskData = {};
+
+    // TODO:あとで必要か確認
+    public menu2: boolean = false;
+
+    @Emit('on-click-task-detail-save')
+    public onClickTaskDetailSaveEmit(selectedTask: TaskData){}
+
+    // タスク名のバリデーション
+    public nameRules =  [
+      (v: string) => !!v || 'タスク名は必須です',
+      (v: string) => v.length <= 50 || 'タスク名は50字以内で入力してください',
+    ]
+
+    // 詳細のバリデーション
+    public detailRules = [
+      (v: string) => v?.length <= 200 || !v || '詳細は200字以内で入力してください'
+    ]
+
+    // 登録されているタスクを取得する
+    public onClickSave(selectedTask: TaskData) {
+      this.task.status = this.taskStatus;
+      this.onClickTaskDetailSaveEmit(selectedTask);
     }
   }
 </script>
