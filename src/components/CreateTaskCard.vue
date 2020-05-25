@@ -46,49 +46,47 @@
   </div>
 </template>
 
-<script>
-  export default {
-    props: {
-      // 入力用のテキストボックスを表示するかどうか
-      isTaskTextHide: {
-        type: Boolean,
-      },
-      // ステータスのKey
-      statusKey: {
-        type: String,
-      },
-    },
+<script lang="ts">
+  import { Component, Vue, Emit, Prop, Watch } from 'vue-property-decorator';
 
-    data() {
-      return {
-        task: {},
-        nameRules: [
-          v => !!v || 'タスク名は必須です',
-          v => !!v && v.length <= 50 || 'タスク名は50字以内で入力してください',
-        ],
-      }
-    },
+  @Component
+  export default class CreateTaskCard extends Vue {
+    @Prop()
+    // 入力用のテキストボックスを表示するかどうか
+    public isTaskTextHide?: boolean;
 
-    watch: {
-      isTaskTextHide(is_task_text_hide) {
-        if(!is_task_text_hide) {
+    @Prop()
+    // ステータスのKey
+    public statusKey?: String;
+
+    // TODO:定義ファイル作成
+    public task: object = {};
+
+    // タスク名のバリデーション
+    public nameRules = [
+      (v: string) => !!v || 'タスク名は必須です',
+      (v: string) => !!v && v.length <= 50 || 'タスク名は50字以内で入力してください',
+    ]
+
+    @Watch('is_task_text_hide')
+    public isTaskText(){
+      if(!this.isTaskTextHide) {
           this.init()
         }
-      }
-    },
+    }
 
-    methods: {
-      // 初期化処理
-      init() {
-        this.task = {};
-      },
+    @Emit('on-click-cancel')
+    public onClickCanselEmit(){}
 
-      // キャンセルボタンが押された時
-      onClickCansel() {
-        this.task = {};
-        this.$emit('on-click-cancel')
-      },
+    // 初期化処理
+    public init(){
+      this.task = {};
+    }
+
+    // キャンセルボタンが押された時
+    public onClickCansel(){
+      this.task = {};
+      this.onClickCanselEmit();
     }
   }
-
 </script>
