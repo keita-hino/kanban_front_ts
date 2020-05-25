@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../components/Login.vue'
+import Tasks from '@/pages/tasks/Index.vue'
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -8,8 +9,8 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    component: Tasks,
+    name: 'Tasks'
   },
   {
     path: '/login',

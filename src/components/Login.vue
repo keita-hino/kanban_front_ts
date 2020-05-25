@@ -50,30 +50,28 @@
   </v-content>
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
   // TODO:最上位で読み込んで注入するようにする
   import axios from 'axios'
-  export default {
-    data() {
-      return {
-        user: {}
-      }
-    },
 
-    methods: {
-      // ログイン
-      login() {
-        axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
-          .then(response => {
-            // TODO:ログイン失敗した場合の処理追加
-            const data = {
-              user: response.data.data
-            }
-            this.$store.commit('auth/login', data.user);
-            this.$store.commit('workspace/setWorkspace', response.data.workspace);
-            this.$router.push({name: 'Tasks'});
-          });
-      }
+  @Component
+  export default class Login extends Vue {
+    public user: object = {};
+
+    // ログイン
+    public login(){
+      axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
+        .then(response => {
+          // TODO:ログイン失敗した場合の処理追加
+          const data = {
+            user: response.data.data
+          }
+          this.$store.commit('auth/login', data.user);
+          this.$store.commit('workspace/setWorkspace', response.data.workspace);
+          this.$router.push({name: 'Tasks'});
+        });
     }
   }
+
 </script>
