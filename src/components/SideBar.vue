@@ -52,37 +52,35 @@
   </v-card>
 </template>
 
-<script>
-  export default {
-    data () {
-      return {
-        workspaces: {},
-      }
-    },
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+  // TODO:最上位で読み込んで注入するようにする
+  import axios from 'axios'
 
-    mounted() {
+  @Component
+  export default class SideBar extends Vue {
+    public workspaces: object = {};
+
+    // ユーザーが所属しているワークスペースを取得する
+    public getWorkspaces() {
+      this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: this.$store.state.auth.email }})
+        .then(response => {
+          this.workspaces = response.data.workspaces
+        });
+    }
+
+    // ワークスペースが選択された時
+    public onClickWorkspace(workspace: Object){
+      this.$store.commit('workspace/setWorkspace', workspace);
+    }
+
+    // 画像のパスを整形する
+    public imageUrl(image_url: String){
+      return `${process.env.VUE_APP_BASE_URL}/${image_url}`
+    }
+
+    mounted(): void {
       this.getWorkspaces();
-    },
-
-    methods: {
-      // ユーザーが所属しているワークスペースを取得する
-      getWorkspaces() {
-        this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: this.$store.state.auth.email }})
-          .then(response => {
-            this.workspaces = response.data.workspaces
-          });
-      },
-
-      // ワークスペースが選択された時
-      onClickWorkspace(workspace){
-        this.$store.commit('workspace/setWorkspace', workspace);
-      },
-
-      // 画像のパスを整形する
-      imageUrl(image_url){
-        return `${process.env.VUE_APP_BASE_URL}/${image_url}`
-      }
-
     }
   }
 </script>
