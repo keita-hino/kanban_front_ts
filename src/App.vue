@@ -16,33 +16,28 @@
   </v-app>
 </template>
 
-<script>
-  import Header from '@/components/Header'
-  import SideBar from '@/components/SideBar'
-  import Store from '@/store'
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
 
-  export default {
-    data: function () {
-      return {
-      }
-    },
+  import Header from '@/components/Header.vue'
+  import SideBar from '@/components/SideBar.vue'
+
+  @Component({
     components: {
       Header,
       SideBar
-    },
+    }
+  })
 
-    methods:{
-      // ログインしているか
-      isLogined() {
-        return Store.state.auth.email != null
-      },
-    },
+  export default class App extends Vue {
+    isLogined() {
+      return this.$store.state.auth.email != null
+    }
 
     mounted(){
-      if(Store.state.auth.email == null && this.$route.name != 'Login'){
+      if(this.$store.state.auth.email == null && this.$route.name != 'Login'){
         this.$router.push({name: 'Login'})
       }
-    },
-
+    }
   }
 </script>

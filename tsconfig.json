@@ -10,8 +10,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    // 一通り動くようになったら外す
-    // "noImplicitAny": false,
+    // TODO:一通り動くようになったらtrueにする
+    // "noImplicitAny": true,
     "baseUrl": ".",
     "types": [
       "webpack-env",
