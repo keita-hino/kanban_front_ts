@@ -71,8 +71,8 @@
     @Watch('is_task_text_hide')
     public isTaskText(){
       if(!this.isTaskTextHide) {
-          this.init()
-        }
+        this.init()
+      }
     }
 
     @Emit('on-click-cancel')
