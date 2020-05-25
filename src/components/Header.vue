@@ -50,64 +50,65 @@
   </v-app-bar>
 </template>
 
-<script>
-  import _ from 'lodash'
+<script lang="ts">
+  import _ from 'lodash';
+  // TODO:最上位で読み込んで注入するようにする
+  import axios from 'axios'
 
-  import UserProfileModal from './UserProfileModal'
+  import { UserData } from '@/types/user'
 
-  export default {
-    data: function () {
-      return {
-        user: {},
-        drawer: false,
-        is_profile_modal_show: false
-      }
-    },
-    components:{
+  import { Component, Vue } from 'vue-property-decorator';
+  import UserProfileModal from './UserProfileModal.vue';
+
+  @Component({
+    components: {
       UserProfileModal
-    },
+    }
+  })
 
-    methods: {
-      // ログアウトボタン押下時
-      onClickLogout() {
+  export default class Header extends Vue {
+    public user: UserData = {};
+    public drawer: boolean = false;
+    public is_profile_modal_show: boolean = false;
+
+    // ログアウトボタン押下時
+    public onClickLogout() {
+      this.$store.commit('auth/logout');
+      this.$router.push({name: 'Login'})
+    }
+
+    // ユーザ設定モーダルでキャンセルボタンが押された時
+    public onClickModalCancel() {
+      this.is_profile_modal_show = false;
+    }
+
+    // ユーザ設定モーダルで更新ボタンが押された時
+    public updateUser(user: UserData) {
+      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
+        user: user,
+      })
+      .then( () => {
+        this.is_profile_modal_show = false;
         this.$store.commit('auth/logout');
         this.$router.push({name: 'Login'})
-      },
+      });
+    }
 
-      // ユーザ設定モーダルでキャンセルボタンが押された時
-      onClickModalCancel() {
-        this.is_profile_modal_show = false;
-      },
+    // フルネーム取得
+    public fullName(){
+      return `${this.$store.state.auth.last_name} ${this.$store.state.auth.first_name}`
+    }
 
-      // ユーザ設定モーダルで更新ボタンが押された時
-      updateUser(user) {
-        this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
-          user: user,
-        })
-        .then( () => {
-          this.is_profile_modal_show = false;
-          this.$store.commit('auth/logout');
-          this.$router.push({name: 'Login'})
-        });
+    // ログインしているか
+    public isLogined() {
+      return this.$store.state.auth.email != null
+    }
 
-      },
-
-      // フルネーム取得
-      fullName(){
-        return `${this.$store.state.auth.last_name} ${this.$store.state.auth.first_name}`
-      },
-
-      // ログインしているか
-      isLogined() {
-        return this.$store.state.auth.email != null
-      },
-
-      // プロファイル設定モーダルを開く
-      onProfileModalOpen() {
-        this.is_profile_modal_show = true;
-        this.user = _.cloneDeep(this.$store.state.auth)
-      },
-    },
+    // プロファイル設定モーダルを開く
+    public onProfileModalOpen() {
+      this.is_profile_modal_show = true;
+      this.user = _.cloneDeep(this.$store.state.auth)
+    }
   }
 </script>
 
