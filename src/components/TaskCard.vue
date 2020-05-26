@@ -39,73 +39,82 @@
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+  import { TaskData } from '@/types/task'
+
   import draggable from 'vuedraggable'
-  import CreateTaskCard from './CreateTaskCard'
+  import CreateTaskCard from './CreateTaskCard.vue'
 
-  export default {
-    props: {
-      // レーン名
-      subTitle: {
-        type: String,
-      },
-      // ステータスのKey
-      statusKey: {
-        type: String,
-      },
-      tasks: {
-        type: Array,
-      }
-    },
-
-    data() {
-      return {
-        is_task_text_hide: true,
-        task: {},
-        // draggabbleで使用するオプション
-        options: {
-          group: "myGroup",
-          animation: 200
-        },
-
-      }
-    },
-
+  @Component({
     components: {
       draggable,
       CreateTaskCard
-    },
+    }
+  })
 
-    methods: {
-      onUpdateTaskStatus(event) {
-        this.$emit('on-update-task-status', event)
-      },
+  export default class TaskCard extends Vue {
+    @Prop()
+    // レーン名
+    public subTitle?: string;
 
-      // 横に移動した時に発火
-      draggableEnd(event) {
-        this.$emit('on-draggable-end', event)
-      },
+    @Prop()
+    // ステータスのKey
+    public statusKey?: string;
 
-      // 詳細モーダルを開く
-      onDetailModalOpen(task) {
-        this.$emit('on-detail-modal-open', task)
-      },
+    @Prop()
+    // タスク一覧
+    public tasks?: object[];
 
-      // タスクの新規作成
-      onClickCreateTask(task, statusKey) {
-        this.is_task_text_hide = true;
-        task.status = statusKey
-        this.$emit('create-task', task)
-      },
+    public is_task_text_hide: boolean = true;
+    public task: TaskData = {};
+    // draggabbleで使用するオプション
+    public options: object = {
+      group: "myGroup",
+      animation: 200
+    }
 
-      // キャンセルボタンが押された時
-      onClickCansel() {
-        this.is_task_text_hide = true;
-      },
+    @Emit('on-update-task-status')
+    public onUpdateTaskStatusEmit(event: Event){}
 
-      onClickTextShow() {
-        this.is_task_text_hide = false;
-      }
+    @Emit('on-draggable-end')
+    public draggableEndEmit(event: Event){}
+
+    @Emit('on-detail-modal-open')
+    public onDetailModalOpenEmit(task: TaskData){}
+
+    @Emit('create-task')
+    public onClickCreateTaskEmit(task: TaskData){}
+
+    // タスクの更新
+    public onUpdateTaskStatus(event: Event) {
+      this.onUpdateTaskStatusEmit(event);
+    }
+
+    // 横に移動した時に発火
+    public draggableEnd(event: Event) {
+      this.draggableEndEmit(event);
+    }
+
+    // 詳細モーダルを開く
+    public onDetailModalOpen(task: TaskData) {
+      this.onDetailModalOpenEmit(task);
+    }
+
+    // タスクの新規作成
+    public onClickCreateTask(task: TaskData, statusKey: string) {
+      this.is_task_text_hide = true;
+      task.status = statusKey;
+      this.onClickCreateTaskEmit(task);
+    }
+
+    // キャンセルボタンが押された時
+    public onClickCansel() {
+      this.is_task_text_hide = true;
+    }
+
+    public onClickTextShow() {
+      this.is_task_text_hide = false;
     }
   }
 </script>
