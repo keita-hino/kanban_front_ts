@@ -5,4 +5,5 @@ export interface TaskData {
   due_date?: Date; // enum でも
   priority?: string;
   detail?: string;
+  display_order?: number;
 }
