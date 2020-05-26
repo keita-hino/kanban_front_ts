@@ -37,162 +37,175 @@
   </v-content>
 </template>
 
-<script>
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
   // TODO:最上位で読み込んで注入するようにする
   import axios from 'axios'
 
   import _ from 'lodash'
 
-  import TaskCard from '../../components/TaskCard'
-  import TaskDetailModal from '../../components/TaskDetailModal'
+  import { TaskData } from '@/types/task'
+  import { EventData } from '@/types/event'
+  import TaskCard from '@/components/TaskCard.vue'
+  import TaskDetailModal from '@/components/TaskDetailModal.vue'
 
-
-  export default {
-    data() {
-      return {
-        tasks: [],
-        priorities: [],
-        statuses: {},
-        // タスク詳細設定用モーダルを表示するかどうか
-        is_task_detail_modal_show: false,
-        is_task_text_hide: true,
-        selectedTask: {},
-        // タスク詳細設定用モーダルに渡す用のタスクステータス
-        task_status: ''
-      }
-    },
-
+  @Component({
     components: {
       TaskCard,
       TaskDetailModal
-    },
+    }
+  })
 
-    methods: {
-      // 登録されているタスクを取得する
-      getTasks() {
-        let workspace_id = this.getWorkspaceId()
-        axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
-          .then(response => {
-            this.tasks = response.data.tasks
-            this.priorities = response.data.priorities
-            this.statuses = response.data.statuses
-          });
-      },
+  export default class Index extends Vue {
+    public tasks: TaskData[] = [];
+    public priorities: string[] = [];
+    public statuses: object = {};
+    // タスク詳細設定用モーダルを表示するかどうか
+    public is_task_detail_modal_show: boolean = false;
+    public is_task_text_hide: boolean = true;
+    public selectedTask: TaskData = {};
+    // タスク詳細設定用モーダルに渡す用のタスクステータス
+    public task_status: string = '';
 
-      // タスクの新規作成
-      createTask(task) {
-        let workspace_id = this.getWorkspaceId()
-        // タスク新規作成
-        axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id
-        })
-        .then( response => {
-          this.is_task_text_hide = true;
+    // 登録されているタスクを取得する
+    public getTasks() {
+      let workspace_id = this.getWorkspaceId()
+      axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
+        .then(response => {
           this.tasks = response.data.tasks
+          this.priorities = response.data.priorities
+          this.statuses = response.data.statuses
         });
-      },
+    }
 
-      // タスクの詳細設定用モーダルを開く
-      onDetailModalOpen(task){
-        this.selectedTask = _.cloneDeep(task)
-        this.task_status = status;
-        this.is_task_detail_modal_show = true;
-      },
+    // タスクの新規作成
+    public createTask(task: TaskData) {
+      let workspace_id = this.getWorkspaceId()
+      // タスク新規作成
+      axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+        task: task,
+        workspace_id: workspace_id
+      })
+      .then( response => {
+        this.is_task_text_hide = true;
+        this.tasks = response.data.tasks
+      });
+    }
 
-      onClickTaskDetailCancel(){
+    // タスクの詳細設定用モーダルを開く
+    public onDetailModalOpen(task: TaskData){
+      this.selectedTask = _.cloneDeep(task)
+      this.task_status = status;
+      this.is_task_detail_modal_show = true;
+    }
+
+    // タスク詳細モーダルでキャンセルボタンが押された時
+    public onClickTaskDetailCancel(){
+      this.is_task_detail_modal_show = false;
+    }
+
+    // タスク詳細設定用モーダルで保存ボタンが押された時
+    public onClickTaskDetailSave(task: TaskData){
+      // ワークスペースID取得
+      let workspace_id = this.getWorkspaceId()
+
+      // タスク更新
+      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+        task: task,
+        workspace_id: workspace_id,
+      })
+      .then( response => {
         this.is_task_detail_modal_show = false;
-      },
+        this.tasks = response.data.tasks
+      });
+    }
 
-      // タスク詳細設定用モーダルで保存ボタンが押された時
-      onClickTaskDetailSave(task){
-        // ワークスペースID取得
-        let workspace_id = this.getWorkspaceId()
+    // 縦に移動した時に発火
+    // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
+    // TODO:下記のリファクタリング
+    public onUpdateTaskStatus(event: EventData){
+      // ワークスペースID取得
+      let workspace_id = this.getWorkspaceId()
 
-        // タスク更新
-        axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          this.is_task_detail_modal_show = false;
-          this.tasks = response.data.tasks
-        });
-      },
+      // 該当のレーン上のタスク取得
+      const status = event.from.getAttribute('data-column-status')
+      let filteredTasks = this.tasks.filter( task => task.status == status )
 
-      // 縦に移動した時に発火
-      // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-      // TODO:下記のリファクタリング
-      onUpdateTaskStatus(event){
-        // ワークスペースID取得
-        let workspace_id = this.getWorkspaceId()
+      // 移動するタスク取得
+      let movedTask = filteredTasks.find( (task,index) => index == event.oldIndex )
 
-        // 該当のレーン上のタスク取得
-        const status = event.from.getAttribute('data-column-status')
-        let filteredTasks = this.tasks.filter( task => task.status == status )
+      // 挿入した位置の直下にあるタスク取得
+      let oldTask = filteredTasks.find( (task,index) => index == event.newIndex )
 
-        // 移動するタスク取得
-        let movedTask = filteredTasks.find( (task,index) => index == event.oldIndex )
+      if (!movedTask) {
+        return ''
+      }
 
-        // 挿入した位置の直下にあるタスク取得
-        let oldTask = filteredTasks.find( (task,index) => index == event.newIndex )
+      // 挿入先のdisplay_order設定
+      movedTask.display_order = oldTask?.display_order
 
-        // 挿入先のdisplay_order設定
-        movedTask.display_order = oldTask.display_order
+      // タスクの並び更新処理
+      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
+        task: movedTask,
+        old_display_order: movedTask.display_order,
+        workspace_id: workspace_id,
+      })
+      .then( response => {
+        this.tasks = response.data.tasks
+      });
 
-        // タスクの並び更新処理
-        axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
-          task: movedTask,
-          old_display_order: movedTask.display_order,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          this.tasks = response.data.tasks
-        });
-      },
+    }
 
-      // 横に移動した時に発火
-      // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-      draggableEnd(event) {
-        if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
-          return 0
-        }
+    // 横に移動した時に発火
+    // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
+    draggableEnd(event: EventData) {
+      if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
+        return 0
+      }
 
-        // ワークスペースID取得
-        let workspace_id = this.getWorkspaceId()
+      // ワークスペースID取得
+      let workspace_id = this.getWorkspaceId()
 
-        // TODO:ロジックのリファクタリング
-        let status = event.from.getAttribute('data-column-status')
-        let filteredTasks = this.tasks.filter( task => task.status == status )
-        let findedTask = filteredTasks.find( (task, index) => index == event.oldIndex )
-        findedTask.status = event.to.getAttribute('data-column-status')
+      // TODO:ロジックのリファクタリング
+      let status = event.from.getAttribute('data-column-status')
+      let filteredTasks = this.tasks.filter( task => task.status == status )
+      let findedTask = filteredTasks.find( (task, index) => index == event.oldIndex )
+      if(!findedTask){
+        return ''
+      }
 
-        // 挿入した位置の直下にあるタスクのdisplay_order取得
-        let oldStatus = event.to.getAttribute('data-column-status')
-        let findOldTasks = this.tasks.filter( task => task.status == oldStatus )
-        findedTask.display_order = findOldTasks.find( (task, index) => index == event.newIndex ).display_order
+      findedTask.status = event.to.getAttribute('data-column-status')
 
-        // タスクの並び更新処理
-        axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
-          task: findedTask,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          this.tasks = response.data.tasks
-        });
+      // 挿入した位置の直下にあるタスクのdisplay_order取得
+      let oldStatus = event.to.getAttribute('data-column-status')
+      let findOldTasks = this.tasks.filter( task => task.status == oldStatus )
+      if(!findOldTasks){
+        return ''
+      }
 
-      },
+      findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
-      // ストアからワークスペースIDを取得する
-      getWorkspaceId() {
-        return this.$store.getters['workspace/id']
-      },
+      // タスクの並び更新処理
+      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
+        task: findedTask,
+        workspace_id: workspace_id,
+      })
+      .then( response => {
+        this.tasks = response.data.tasks
+      });
 
-      // ステータスでフィルタリングしたタスクを返す
-      filteredTasks(key) {
-        return this.tasks.filter( task => task.status == key )
-      },
-    },
+    }
+
+    // ステータスでフィルタリングしたタスクを返す
+    public filteredTasks(key: string) {
+      return this.tasks.filter( task => task.status == key )
+    }
+
+    // ストアからワークスペースIDを取得する
+    public getWorkspaceId() {
+      return this.$store.getters['workspace/id']
+    }
 
     mounted(){
       this.getTasks();
@@ -207,9 +220,6 @@
           this.getTasks();
         }}
       )
-    },
-
-    computed: {
     }
   }
 </script>
