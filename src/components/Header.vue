@@ -52,8 +52,6 @@
 
 <script lang="ts">
   import _ from 'lodash';
-  // TODO:最上位で読み込んで注入するようにする
-  import axios from 'axios'
 
   import { UserData } from '@/types/user'
 
@@ -84,7 +82,7 @@
 
     // ユーザ設定モーダルで更新ボタンが押された時
     public updateUser(user: UserData) {
-      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
+      this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
         user: user,
       })
       .then( () => {

@@ -54,8 +54,6 @@
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-  // TODO:最上位で読み込んで注入するようにする
-  import axios from 'axios'
 
   @Component
   export default class SideBar extends Vue {
