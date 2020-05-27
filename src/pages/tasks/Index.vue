@@ -39,10 +39,6 @@
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
-
-  // TODO:最上位で読み込んで注入するようにする
-  import axios from 'axios'
-
   import _ from 'lodash'
 
   import { TaskData } from '@/types/task'
@@ -71,7 +67,7 @@
     // 登録されているタスクを取得する
     public getTasks() {
       let workspace_id = this.getWorkspaceId()
-      axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
+      this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
         .then(response => {
           this.tasks = response.data.tasks
           this.priorities = response.data.priorities
@@ -83,7 +79,7 @@
     public createTask(task: TaskData) {
       let workspace_id = this.getWorkspaceId()
       // タスク新規作成
-      axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+      this.axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
         task: task,
         workspace_id: workspace_id
       })
@@ -111,7 +107,7 @@
       let workspace_id = this.getWorkspaceId()
 
       // タスク更新
-      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+      this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
         task: task,
         workspace_id: workspace_id,
       })
@@ -146,7 +142,7 @@
       movedTask.display_order = oldTask?.display_order
 
       // タスクの並び更新処理
-      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
+      this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
         task: movedTask,
         old_display_order: movedTask.display_order,
         workspace_id: workspace_id,
@@ -187,7 +183,7 @@
       findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
       // タスクの並び更新処理
-      axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
+      this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
         task: findedTask,
         workspace_id: workspace_id,
       })
