@@ -70,18 +70,18 @@
     public is_profile_modal_show: boolean = false;
 
     // ログアウトボタン押下時
-    public onClickLogout() {
+    public onClickLogout(): void {
       this.$store.commit('auth/logout');
       this.$router.push({name: 'Login'})
     }
 
     // ユーザ設定モーダルでキャンセルボタンが押された時
-    public onClickModalCancel() {
+    public onClickModalCancel(): void {
       this.is_profile_modal_show = false;
     }
 
     // ユーザ設定モーダルで更新ボタンが押された時
-    public updateUser(user: UserData) {
+    public updateUser(user: UserData): void {
       this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
         user: user,
       })
@@ -93,17 +93,17 @@
     }
 
     // フルネーム取得
-    public fullName(){
+    public fullName(): string{
       return `${this.$store.state.auth.last_name} ${this.$store.state.auth.first_name}`
     }
 
     // ログインしているか
-    public isLogined() {
+    public isLogined(): boolean {
       return this.$store.state.auth.email != null
     }
 
     // プロファイル設定モーダルを開く
-    public onProfileModalOpen() {
+    public onProfileModalOpen(): void {
       this.is_profile_modal_show = true;
       this.user = _.cloneDeep(this.$store.state.auth)
     }

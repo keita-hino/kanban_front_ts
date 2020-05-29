@@ -69,7 +69,7 @@
     ]
 
     @Watch('is_task_text_hide')
-    public isTaskText(){
+    public isTaskText(): void{
       if(!this.isTaskTextHide) {
         this.init()
       }
@@ -79,12 +79,12 @@
     public onClickCanselEmit(){}
 
     // 初期化処理
-    public init(){
+    public init(): void{
       this.task = {};
     }
 
     // キャンセルボタンが押された時
-    public onClickCansel(){
+    public onClickCansel(): void{
       this.task = {};
       this.onClickCanselEmit();
     }
