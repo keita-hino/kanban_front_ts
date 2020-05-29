@@ -65,7 +65,7 @@
     public task_status: string = '';
 
     // 登録されているタスクを取得する
-    public getTasks() {
+    public getTasks(): void {
       let workspace_id = this.getWorkspaceId()
       this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
         .then(response => {
@@ -76,7 +76,7 @@
     }
 
     // タスクの新規作成
-    public createTask(task: TaskData) {
+    public createTask(task: TaskData): void {
       let workspace_id = this.getWorkspaceId()
       // タスク新規作成
       this.axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
@@ -90,19 +90,19 @@
     }
 
     // タスクの詳細設定用モーダルを開く
-    public onDetailModalOpen(task: TaskData){
+    public onDetailModalOpen(task: TaskData): void{
       this.selectedTask = _.cloneDeep(task)
       this.task_status = status;
       this.is_task_detail_modal_show = true;
     }
 
     // タスク詳細モーダルでキャンセルボタンが押された時
-    public onClickTaskDetailCancel(){
+    public onClickTaskDetailCancel(): void{
       this.is_task_detail_modal_show = false;
     }
 
     // タスク詳細設定用モーダルで保存ボタンが押された時
-    public onClickTaskDetailSave(task: TaskData){
+    public onClickTaskDetailSave(task: TaskData): void{
       // ワークスペースID取得
       let workspace_id = this.getWorkspaceId()
 
@@ -120,7 +120,7 @@
     // 縦に移動した時に発火
     // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
     // TODO:下記のリファクタリング
-    public onUpdateTaskStatus(event: EventData){
+    public onUpdateTaskStatus(event: EventData): void | string{
       // ワークスペースID取得
       let workspace_id = this.getWorkspaceId()
 
@@ -155,9 +155,9 @@
 
     // 横に移動した時に発火
     // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-    draggableEnd(event: EventData) {
+    draggableEnd(event: EventData): void | string {
       if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
-        return 0
+        return ''
       }
 
       // ワークスペースID取得
@@ -194,12 +194,12 @@
     }
 
     // ステータスでフィルタリングしたタスクを返す
-    public filteredTasks(key: string) {
+    public filteredTasks(key: string): TaskData[] {
       return this.tasks.filter( task => task.status == key )
     }
 
     // ストアからワークスペースIDを取得する
-    public getWorkspaceId() {
+    public getWorkspaceId(): number {
       return this.$store.getters['workspace/id']
     }
 
