@@ -81,7 +81,7 @@
     public onClickUserSaveEmit(user: UserData){};
 
     @Watch('isProfileModalShow')
-    public isProfileModalShowWatch(){
+    public isProfileModalShowWatch(): void{
       if(this.isProfileModalShow) {
         this.init()
       }
@@ -111,7 +111,7 @@
     }
 
     // 変更ボタンが押された時
-    onClickUpdateUser(user: UserData) {
+    onClickUpdateUser(user: UserData): void {
       this.onClickUserSaveEmit(user);
     }
 

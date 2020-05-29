@@ -125,7 +125,7 @@
     ]
 
     // 登録されているタスクを取得する
-    public onClickSave(selectedTask: TaskData) {
+    public onClickSave(selectedTask: TaskData): void {
       this.task.status = this.taskStatus;
       this.onClickTaskDetailSaveEmit(selectedTask);
     }

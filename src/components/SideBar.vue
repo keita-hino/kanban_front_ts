@@ -60,7 +60,7 @@
     public workspaces: object = {};
 
     // ユーザーが所属しているワークスペースを取得する
-    public getWorkspaces() {
+    public getWorkspaces(): void {
       this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: this.$store.state.auth.email }})
         .then(response => {
           this.workspaces = response.data.workspaces
@@ -68,12 +68,12 @@
     }
 
     // ワークスペースが選択された時
-    public onClickWorkspace(workspace: Object){
+    public onClickWorkspace(workspace: Object): void{
       this.$store.commit('workspace/setWorkspace', workspace);
     }
 
     // 画像のパスを整形する
-    public imageUrl(image_url: String){
+    public imageUrl(image_url: String): string{
       return `${process.env.VUE_APP_BASE_URL}/${image_url}`
     }
 

@@ -58,7 +58,7 @@
     public user: object = {};
 
     // ログイン
-    public login(){
+    public login(): void{
       this.axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
         .then(response => {
           // TODO:ログイン失敗した場合の処理追加

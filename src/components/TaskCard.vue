@@ -87,33 +87,33 @@
     public onClickCreateTaskEmit(task: TaskData){}
 
     // タスクの更新
-    public onUpdateTaskStatus(event: Event) {
+    public onUpdateTaskStatus(event: Event): void {
       this.onUpdateTaskStatusEmit(event);
     }
 
     // 横に移動した時に発火
-    public draggableEnd(event: Event) {
+    public draggableEnd(event: Event): void {
       this.draggableEndEmit(event);
     }
 
     // 詳細モーダルを開く
-    public onDetailModalOpen(task: TaskData) {
+    public onDetailModalOpen(task: TaskData): void {
       this.onDetailModalOpenEmit(task);
     }
 
     // タスクの新規作成
-    public onClickCreateTask(task: TaskData, statusKey: string) {
+    public onClickCreateTask(task: TaskData, statusKey: string): void {
       this.is_task_text_hide = true;
       task.status = statusKey;
       this.onClickCreateTaskEmit(task);
     }
 
     // キャンセルボタンが押された時
-    public onClickCansel() {
+    public onClickCansel(): void {
       this.is_task_text_hide = true;
     }
 
-    public onClickTextShow() {
+    public onClickTextShow(): void {
       this.is_task_text_hide = false;
     }
   }
