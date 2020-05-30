@@ -117,30 +117,4 @@
 
   }
 
-
-  // export default {
-
-  //   data() {
-  //     return {
-  //       file: '',
-  //       lastNameRules: [
-  //         v => !!v || '姓は必須です',
-  //         v => v.length <= 20 || '姓は20字以内で入力してください',
-  //       ],
-  //       firstNameRules: [
-  //         v => !!v || '名は必須です',
-  //         v => v.length <= 20 || '名は20字以内で入力してください',
-  //       ],
-  //       emailRules: [
-  //         v => !!v || 'メールアドレスは必須です',
-  //         v => v.length <= 20 || 'メールアドレスは20字以内で入力してください',
-  //       ],
-  //     }
-  //   },
-
-  //   components: {
-  //     // ImgInputer
-  //   },
-
-
 </script>
