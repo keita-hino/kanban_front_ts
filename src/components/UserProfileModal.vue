@@ -106,7 +106,7 @@
     ]
 
     // 初期化
-    public init(){
+    public init(): void{
       !!this.user ? this.user.before_email = this?.user?.email : ""
     }
 

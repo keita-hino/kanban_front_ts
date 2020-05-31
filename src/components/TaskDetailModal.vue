@@ -104,7 +104,6 @@
     // ステータス{key: i18n}
     public statuses?: object;
 
-    // TODO:定義ファイル作成
     public task: TaskData = {};
 
     // TODO:あとで必要か確認
