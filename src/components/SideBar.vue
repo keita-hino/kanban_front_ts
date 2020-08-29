@@ -29,7 +29,7 @@
 
             <v-list-item-action>
               <v-avatar
-                v-for="workspace in workspaces" :key="workspace.id"
+                v-for="workspace in state.workspaces" :key="workspace.id"
                 size="36"
                 :tile="true"
                 class="mb-4 avator"
@@ -53,34 +53,46 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, ref, reactive, onMounted } from "@vue/composition-api";
   import { Component, Vue } from 'vue-property-decorator';
+  import { WorkspaceData } from '@/types/workspace'
+  import axios from "axios";
 
-  @Component
-  export default class SideBar extends Vue {
-    public workspaces: object = {};
+  export default defineComponent ({
+    setup(_props, context) {
+      onMounted(() => {
+        getWorkspaces();
+      })
 
-    // ユーザーが所属しているワークスペースを取得する
-    public getWorkspaces(): void {
-      this.axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: this.$store.state.auth.email }})
-        .then(response => {
-          this.workspaces = response.data.workspaces
-        });
+      const state = reactive<{ workspaces: WorkspaceData[] }>({
+        workspaces: []
+      });
+
+      // ユーザーが所属しているワークスペースを取得する
+      const getWorkspaces = () => {
+        axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: context.root.$store.state.auth.email }})
+          .then(response => {
+            state.workspaces = response.data.workspaces
+          });
+        return state;
+      }
+
+      // ワークスペースが選択された時
+      const onClickWorkspace = (workspace: Object) => {
+        context.root.$store.commit('workspace/setWorkspace', workspace);
+      }
+
+      const imageUrl = (image_url: String) => {
+        return `${process.env.VUE_APP_BASE_URL}/${image_url}`
+      }
+
+      return {
+        state,
+        onClickWorkspace,
+        imageUrl,
+      };
     }
-
-    // ワークスペースが選択された時
-    public onClickWorkspace(workspace: Object): void{
-      this.$store.commit('workspace/setWorkspace', workspace);
-    }
-
-    // 画像のパスを整形する
-    public imageUrl(image_url: String): string{
-      return `${process.env.VUE_APP_BASE_URL}/${image_url}`
-    }
-
-    mounted(): void {
-      this.getWorkspaces();
-    }
-  }
+  })
 </script>
 
 <style>
