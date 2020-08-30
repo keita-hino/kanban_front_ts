@@ -15,7 +15,7 @@
           <v-row>
             <v-col cols="11" class="ml-5">
               <v-text-field
-                v-model="user.email"
+                v-model="state.user.email"
                 append-icon="person"
                 name="login"
                 label="メールアドレス"
@@ -26,7 +26,7 @@
             </v-col>
             <v-col cols="11" class="ml-5">
               <v-text-field
-                v-model="user.password"
+                v-model="state.user.password"
                 append-icon="lock"
                 name="password"
                 label="パスワード"
@@ -51,25 +51,33 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, reactive } from '@vue/composition-api'
   import { Component, Vue } from 'vue-property-decorator';
+  import { UserData } from '@/types/user'
 
-  @Component
-  export default class Login extends Vue {
-    public user: object = {};
+  export default defineComponent({
+    setup(_props, context){
+      const state = reactive<{ user: UserData }>({
+        user: {}
+      })
 
-    // ログイン
-    public login(): void{
-      this.axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, this.user)
+      const login = () => {
+        context.root.axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, state.user)
         .then(response => {
           // TODO:ログイン失敗した場合の処理追加
           const data = {
             user: response.data.data
           }
-          this.$store.commit('auth/login', data.user);
-          this.$store.commit('workspace/setWorkspace', response.data.workspace);
-          this.$router.push({name: 'Tasks'});
+          context.root.$store.commit('auth/login', data.user);
+          context.root.$store.commit('workspace/setWorkspace', response.data.workspace);
+          context.root.$router.push({name: 'Tasks'});
         });
-    }
-  }
+      }
 
+      return {
+        state,
+        login
+      }
+    }
+  })
 </script>
