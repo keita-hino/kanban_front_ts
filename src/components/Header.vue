@@ -44,7 +44,7 @@
       @on-click-modal-cancel="onClickModalCancel"
       @update-user="updateUser"
       :is-profile-modal-show="is_profile_modal_show"
-      :user="user"
+      :user="state.user"
     />
 
   </v-app-bar>
@@ -55,64 +55,78 @@
 
   import { UserData } from '@/types/user'
 
+  import { defineComponent, reactive, ref } from '@vue/composition-api'
   import { Component, Vue } from 'vue-property-decorator';
   import UserProfileModal from './UserProfileModal.vue';
 
-  @Component({
-    components: {
-      UserProfileModal
+  export default defineComponent({
+    components: { UserProfileModal},
+
+    setup(_props, context){
+      const state = reactive<{ user: UserData }>({
+        user: {}
+      })
+
+      const drawer = ref<boolean>( false )
+      const is_profile_modal_show = ref<boolean>( false )
+
+      // ログアウトボタン押下時
+      const onClickLogout = () => {
+        context.root.$store.commit('auth/logout');
+        context.root.$router.push({name: 'Login'})
+      }
+
+      // ユーザ設定モーダルでキャンセルボタンが押された時
+      const onClickModalCancel = () => {
+        is_profile_modal_show.value = false;
+      }
+
+      // ユーザ設定モーダルで更新ボタンが押された時
+      const updateUser = (user: UserData) =>  {
+        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
+          user: state.user,
+        })
+        .then( () => {
+          is_profile_modal_show.value = false;
+          context.root.$store.commit('auth/logout');
+          context.root.$router.push({name: 'Login'})
+        });
+      }
+
+      // フルネーム取得
+      const fullName = () => {
+        return `${context.root.$store.state.auth.last_name} ${context.root.$store.state.auth.first_name}`
+      }
+
+      // ログインしているか
+      const isLogined = () => {
+        return context.root.$store.state.auth.email != null
+      }
+
+      // プロファイル設定モーダルを開く
+      const onProfileModalOpen = () => {
+        is_profile_modal_show.value = true;
+        state.user = _.cloneDeep(context.root.$store.state.auth)
+      }
+
+      return {
+        state,
+        is_profile_modal_show,
+        drawer,
+        onClickLogout,
+        onClickModalCancel,
+        updateUser,
+        fullName,
+        isLogined,
+        onProfileModalOpen
+      }
+
     }
   })
-
-  export default class Header extends Vue {
-    public user: UserData = {};
-    public drawer: boolean = false;
-    public is_profile_modal_show: boolean = false;
-
-    // ログアウトボタン押下時
-    public onClickLogout(): void {
-      this.$store.commit('auth/logout');
-      this.$router.push({name: 'Login'})
-    }
-
-    // ユーザ設定モーダルでキャンセルボタンが押された時
-    public onClickModalCancel(): void {
-      this.is_profile_modal_show = false;
-    }
-
-    // ユーザ設定モーダルで更新ボタンが押された時
-    public updateUser(user: UserData): void {
-      this.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
-        user: user,
-      })
-      .then( () => {
-        this.is_profile_modal_show = false;
-        this.$store.commit('auth/logout');
-        this.$router.push({name: 'Login'})
-      });
-    }
-
-    // フルネーム取得
-    public fullName(): string{
-      return `${this.$store.state.auth.last_name} ${this.$store.state.auth.first_name}`
-    }
-
-    // ログインしているか
-    public isLogined(): boolean {
-      return this.$store.state.auth.email != null
-    }
-
-    // プロファイル設定モーダルを開く
-    public onProfileModalOpen(): void {
-      this.is_profile_modal_show = true;
-      this.user = _.cloneDeep(this.$store.state.auth)
-    }
-  }
 </script>
 
 <style>
   .profile-menu{
     color:#ffffff !important;
   }
-
 </style>
