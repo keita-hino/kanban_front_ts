@@ -1,12 +1,12 @@
 <template>
   <div>
-    <template v-if="isTaskTextHide">
+    <template v-if="props.isTaskTextHide">
       <!-- タスク追加用カード -->
       <v-card
         class="mt-2"
         width="330"
       >
-        <v-card-text @click="$emit('on-click-text-show')" class="text-center" style="cursor: pointer">
+        <v-card-text @click="showTextShow()" class="text-center" style="cursor: pointer">
           <v-icon class="mr-1 mb-1" color="blue lighten-2" size=15>add</v-icon>
           <span class="blue--text lighten-2--text subheading mr-2">タスク追加</span>
         </v-card-text>
@@ -19,7 +19,7 @@
       >
         <v-card-text class="pb-0">
           <v-text-field
-            v-model="task.name"
+            v-model="state.task.name"
             label="タスク名"
             outlined
             :counter="50"
@@ -38,7 +38,7 @@
           </div>
 
           <div class="my-2 pr-2">
-            <v-btn small @click="$emit('on-click-create-task', task, statusKey)" :disabled="!task.name" color="primary">作成</v-btn>
+            <v-btn small @click="onClickCreateTask()" :disabled="!state.task.name" color="primary">作成</v-btn>
           </div>
         </v-card-actions>
       </v-card>
@@ -47,46 +47,68 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Emit, Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, reactive, watch } from '@vue/composition-api'
+  import { TaskData } from '@/types/task'
 
-  @Component
-  export default class CreateTaskCard extends Vue {
-    @Prop()
-    // 入力用のテキストボックスを表示するかどうか
-    public isTaskTextHide?: boolean;
+  export default defineComponent({
+    props: {
+      isTaskTextHide: {
+        type: Boolean,
+        required: true
+      },
+      statusKey: {
+        type: String,
+        required: true
+      },
+    },
 
-    @Prop()
-    // ステータスのKey
-    public statusKey?: String;
+    setup(props, { emit }){
+      watch(
+        () => props.isTaskTextHide,
+        () => {
+          if(!props.isTaskTextHide) {
+            init()
+          }
+        }
+      )
 
-    // TODO:定義ファイル作成
-    public task: object = {};
+      const state = reactive<{ task: TaskData }>({
+        task: {}
+      });
 
-    // タスク名のバリデーション
-    public nameRules = [
-      (v: string) => !!v || 'タスク名は必須です',
-      (v: string) => !!v && v.length <= 50 || 'タスク名は50字以内で入力してください',
-    ]
+      // タスク名のバリデーション
+      const nameRules = [
+        (v: string) => !!v || 'タスク名は必須です',
+        (v: string) => !!v && v.length <= 50 || 'タスク名は50字以内で入力してください',
+      ]
 
-    @Watch('is_task_text_hide')
-    public isTaskText(): void{
-      if(!this.isTaskTextHide) {
-        this.init()
+      // 初期化処理
+      const init = (): void => {
+        state.task = {};
+      }
+
+      // キャンセルボタンが押された時
+      const onClickCansel = (): void =>{
+        state.task = {};
+        emit('close');
+      }
+
+      const showTextShow = (): void => {
+        emit('on-click-text-show');
+      }
+
+      const onClickCreateTask = (): void => {
+        emit('on-click-create-task', state.task, props.statusKey)
+      }
+
+      return {
+        state,
+        nameRules,
+        props,
+        onClickCansel,
+        showTextShow,
+        onClickCreateTask
       }
     }
-
-    @Emit('on-click-cancel')
-    public onClickCanselEmit(){}
-
-    // 初期化処理
-    public init(): void{
-      this.task = {};
-    }
-
-    // キャンセルボタンが押された時
-    public onClickCansel(): void{
-      this.task = {};
-      this.onClickCanselEmit();
-    }
-  }
+  })
 </script>
