@@ -56,7 +56,7 @@
   import { defineComponent, ref, reactive, onMounted } from "@vue/composition-api";
   import { Component, Vue } from 'vue-property-decorator';
   import { WorkspaceData } from '@/types/workspace'
-  import axios from "axios";
+  import { fetchWorkspaces } from '@/api/workspace'
 
   export default defineComponent ({
     setup(_props, context) {
@@ -69,12 +69,10 @@
       });
 
       // ユーザーが所属しているワークスペースを取得する
-      const getWorkspaces = () => {
-        axios.get(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {params: { email: context.root.$store.state.auth.email }})
-          .then(response => {
-            state.workspaces = response.data.workspaces
-          });
-        return state;
+      const getWorkspaces = async () => {
+        const response = await fetchWorkspaces(context.root.$store.state.auth.email)
+
+        state.workspaces = response.data.workspaces
       }
 
       // ワークスペースが選択された時
