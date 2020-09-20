@@ -42,7 +42,7 @@
 
     <UserProfileModal
       @on-click-modal-cancel="onClickModalCancel"
-      @update-user="updateUser"
+      @update-user="onClickUpdateUser"
       :is-profile-modal-show="is_profile_modal_show"
       :user="state.user"
     />
@@ -58,6 +58,7 @@
   import { defineComponent, reactive, ref } from '@vue/composition-api'
   import { Component, Vue } from 'vue-property-decorator';
   import UserProfileModal from './UserProfileModal.vue';
+  import { updateUser} from '@/api/user'
 
   export default defineComponent({
     components: { UserProfileModal},
@@ -82,15 +83,12 @@
       }
 
       // ユーザ設定モーダルで更新ボタンが押された時
-      const updateUser = (user: UserData) =>  {
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/users`, {
-          user: state.user,
-        })
-        .then( () => {
-          is_profile_modal_show.value = false;
-          context.root.$store.commit('auth/logout');
-          context.root.$router.push({name: 'Login'})
-        });
+      const onClickUpdateUser = async (user: UserData) =>  {
+        const response = await updateUser(state.user)
+
+        is_profile_modal_show.value = false;
+        context.root.$store.commit('auth/logout');
+        context.root.$router.push({name: 'Login'})
       }
 
       // フルネーム取得
@@ -115,7 +113,7 @@
         drawer,
         onClickLogout,
         onClickModalCancel,
-        updateUser,
+        onClickUpdateUser,
         fullName,
         isLogined,
         onProfileModalOpen
