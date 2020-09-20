@@ -64,7 +64,6 @@
 
       const onClicklogin = async () => {
         const response = await login(state.user)
-        console.log(response)
 
         // TODO:ログイン失敗した場合の処理追加
         const data = {
