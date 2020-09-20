@@ -41,7 +41,7 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <div class="my-2 pr-2">
-            <v-btn @click="login" small color="primary">ログイン</v-btn>
+            <v-btn @click="onClicklogin" small color="primary">ログイン</v-btn>
           </div>
         </v-card-actions>
       </v-card>
@@ -54,6 +54,7 @@
   import { defineComponent, reactive } from '@vue/composition-api'
   import { Component, Vue } from 'vue-property-decorator';
   import { UserData } from '@/types/user'
+  import { login } from '@/api/auth'
 
   export default defineComponent({
     setup(_props, context){
@@ -61,22 +62,21 @@
         user: {}
       })
 
-      const login = () => {
-        context.root.axios.post(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, state.user)
-        .then(response => {
-          // TODO:ログイン失敗した場合の処理追加
-          const data = {
-            user: response.data.data
-          }
-          context.root.$store.commit('auth/login', data.user);
-          context.root.$store.commit('workspace/setWorkspace', response.data.workspace);
-          context.root.$router.push({name: 'Tasks'});
-        });
+      const onClicklogin = async () => {
+        const response = await login(state.user)
+
+        // TODO:ログイン失敗した場合の処理追加
+        const data = {
+          user: response.data.data
+        }
+        context.root.$store.commit('auth/login', data.user);
+        context.root.$store.commit('workspace/setWorkspace', response.data.workspace);
+        context.root.$router.push({name: 'Tasks'});
       }
 
       return {
         state,
-        login
+        onClicklogin
       }
     }
   })
