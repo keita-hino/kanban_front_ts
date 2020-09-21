@@ -8,13 +8,6 @@
         <v-container>
           <v-form ref="user_form">
             <v-row class="d-flex flex-wrap">
-              <!-- <v-col cols="12" sm="6" md="6">
-                <img-inputer v-model="file"
-                  theme="light"
-                  :auto-upload="true"
-                  placeholder="ファイルをここにドラッグする"
-                  bottom-text="ファイルをドロップするかここをクリックしてください" />
-              </v-col> -->
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   v-model="user.last_name"
@@ -53,7 +46,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="$emit('on-click-modal-cancel')">閉じる</v-btn>
+        <v-btn color="blue darken-1" text @click="onClickModalCancel()">閉じる</v-btn>
         <v-btn color="blue darken-1" text @click="onClickUpdateUser(user)" :disabled="!!$refs.user_form && !$refs.user_form.validate()">変更</v-btn>
       </v-card-actions>
     </v-card>
@@ -61,60 +54,69 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator';
+  import { defineComponent, reactive, watch } from '@vue/composition-api'
   import { UserData } from '@/types/user'
-  // import ImgInputer from 'vue-img-inputer'
-  // import 'vue-img-inputer/dist/index.css'
 
-  @Component
-  export default class UserProfileModal extends Vue {
+  export default defineComponent({
+    props: {
+      // モーダル表示/非表示
+      isProfileModalShow: {
+        type: Boolean
+      },
+      // ログイン中のユーザ
+      user: {
+        type: Object as () => UserData
+      },
+    },
+    setup(props, { emit }){
+      watch(
+        () => props.isProfileModalShow,
+        () => {
+          if(props.isProfileModalShow) {
+            init()
+          }
+        }
+      )
 
-    @Prop()
-    // モーダル表示/非表示
-    public isProfileModalShow?: boolean;
+      // 姓のバリデーション
+      const lastNameRules = [
+        (v: string) => !!v || '姓は必須です',
+        (v: string) => v.length <= 20 || '姓は20字以内で入力してください',
+      ]
 
-    @Prop()
-    // ログイン中のユーザ
-    public user?: UserData;
+      // 名のバリデーション
+      const firstNameRules = [
+        (v: string) => !!v || '名は必須です',
+        (v: string) => v.length <= 20 || '名は20字以内で入力してください',
+      ]
 
-    @Emit('update-user')
-    public onClickUserSaveEmit(user: UserData){};
+      // メールアドレスノンバリデーション
+      const emailRules = [
+        (v: string) => !!v || 'メールアドレスは必須です',
+        (v: string) => v.length <= 20 || 'メールアドレスは20字以内で入力してください',
+      ]
 
-    @Watch('isProfileModalShow')
-    public isProfileModalShowWatch(): void{
-      if(this.isProfileModalShow) {
-        this.init()
+      const init = (): void => {
+        !!props.user ? props.user.before_email = props?.user?.email : ""
+      }
+
+      // 変更ボタンが押された時
+      const onClickUpdateUser = (user: UserData): void =>{
+        emit('update-user', user)
+      }
+
+      // キャンセルが押された時
+      const onClickModalCancel = () => {
+        emit('on-click-modal-cancel')
+      }
+
+      return {
+        lastNameRules,
+        firstNameRules,
+        emailRules,
+        onClickUpdateUser,
+        onClickModalCancel
       }
     }
-
-    // 姓のバリデーション
-    public lastNameRules = [
-      (v: string) => !!v || '姓は必須です',
-      (v: string) => v.length <= 20 || '姓は20字以内で入力してください',
-    ]
-
-    // 名のバリデーション
-    public firstNameRules = [
-      (v: string) => !!v || '名は必須です',
-      (v: string) => v.length <= 20 || '名は20字以内で入力してください',
-    ]
-
-    // メールアドレスノンバリデーション
-    public emailRules = [
-      (v: string) => !!v || 'メールアドレスは必須です',
-      (v: string) => v.length <= 20 || 'メールアドレスは20字以内で入力してください',
-    ]
-
-    // 初期化
-    public init(): void{
-      !!this.user ? this.user.before_email = this?.user?.email : ""
-    }
-
-    // 変更ボタンが押された時
-    onClickUpdateUser(user: UserData): void {
-      this.onClickUserSaveEmit(user);
-    }
-
-  }
-
+  });
 </script>
