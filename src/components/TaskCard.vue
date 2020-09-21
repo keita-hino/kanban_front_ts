@@ -12,6 +12,7 @@
         :status-key="statusKey"
       />
 
+      <!-- TODO: 別コンポーネントにする -->
       <draggable
         group="myGroup"
         tag="div"
@@ -40,81 +41,81 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+  import { defineComponent, reactive, ref } from '@vue/composition-api'
   import { TaskData } from '@/types/task'
 
   import draggable from 'vuedraggable'
   import CreateTaskCard from './CreateTaskCard.vue'
 
-  @Component({
-    components: {
-      draggable,
-      CreateTaskCard
+  export default defineComponent({
+    components: { draggable, CreateTaskCard },
+
+    props: {
+      subTitle: {
+        type: String
+      },
+      statusKey: {
+        type: String
+      },
+      tasks: {
+        type: Array as () => TaskData[]
+      }
+    },
+    setup(props, { emit }){
+      const is_task_text_hide = ref<Boolean>( true )
+      const state = reactive<{ task: TaskData }>({
+        task: {}
+      })
+
+      // タスクの更新
+      const onUpdateTaskStatus = (event: Event): void =>  {
+        emit('on-update-task-status', event)
+      }
+
+      // draggable用
+      const options: object = {
+        group: "myGroup",
+        animation: 200
+      }
+
+      // 横に移動した時に発火
+      const draggableEnd = (event: Event): void => {
+        emit('on-draggable-end', event);
+      }
+
+      // 詳細モーダルを開く
+      const onDetailModalOpen = (task: TaskData): void => {
+        emit('on-detail-modal-open', task);
+      }
+
+      // タスクの新規作成
+      const onClickCreateTask = (task: TaskData, statusKey: string): void =>  {
+        is_task_text_hide.value = true;
+        task.status = statusKey;
+        emit('create-task', task);
+      }
+
+      // キャンセルボタンが押された時
+      const onClickCansel = (): void => {
+        is_task_text_hide.value = true;
+      }
+
+      // タスク追加が押された時
+      const onClickTextShow = (): void => {
+        is_task_text_hide.value = false;
+      }
+
+      return {
+        state,
+        is_task_text_hide,
+        options,
+        onClickTextShow,
+        onClickCansel,
+        onClickCreateTask,
+        onUpdateTaskStatus,
+        draggableEnd,
+        onDetailModalOpen
+      }
     }
-  })
-
-  export default class TaskCard extends Vue {
-    @Prop()
-    // レーン名
-    public subTitle?: string;
-
-    @Prop()
-    // ステータスのKey
-    public statusKey?: string;
-
-    @Prop()
-    // タスク一覧
-    public tasks?: object[];
-
-    public is_task_text_hide: boolean = true;
-    public task: TaskData = {};
-    // draggabbleで使用するオプション
-    public options: object = {
-      group: "myGroup",
-      animation: 200
-    }
-
-    @Emit('on-update-task-status')
-    public onUpdateTaskStatusEmit(event: Event){}
-
-    @Emit('on-draggable-end')
-    public draggableEndEmit(event: Event){}
-
-    @Emit('on-detail-modal-open')
-    public onDetailModalOpenEmit(task: TaskData){}
-
-    @Emit('create-task')
-    public onClickCreateTaskEmit(task: TaskData){}
-
-    // タスクの更新
-    public onUpdateTaskStatus(event: Event): void {
-      this.onUpdateTaskStatusEmit(event);
-    }
-
-    // 横に移動した時に発火
-    public draggableEnd(event: Event): void {
-      this.draggableEndEmit(event);
-    }
-
-    // 詳細モーダルを開く
-    public onDetailModalOpen(task: TaskData): void {
-      this.onDetailModalOpenEmit(task);
-    }
-
-    // タスクの新規作成
-    public onClickCreateTask(task: TaskData, statusKey: string): void {
-      this.is_task_text_hide = true;
-      task.status = statusKey;
-      this.onClickCreateTaskEmit(task);
-    }
-
-    // キャンセルボタンが押された時
-    public onClickCansel(): void {
-      this.is_task_text_hide = true;
-    }
-
-    public onClickTextShow(): void {
-      this.is_task_text_hide = false;
-    }
-  }
+  });
 </script>
