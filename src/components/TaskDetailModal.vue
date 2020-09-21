@@ -70,7 +70,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="$emit('on-click-task-detail-cancel')">キャンセル</v-btn>
+          <v-btn color="blue darken-1" text @click="cancelTaskDetail()">キャンセル</v-btn>
           <v-btn class="save" color="blue darken-1" text @click="onClickSave(selectedTask)" :disabled="!!$refs.task_form && !$refs.task_form.validate()">保存</v-btn>
         </v-card-actions>
       </v-card>
@@ -79,54 +79,67 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+  import { defineComponent, reactive, ref } from '@vue/composition-api'
   import { TaskData } from '@/types/task';
 
-  @Component
-  export default class TaskDetailModal extends Vue {
-    @Prop()
-    // タスク表示/非表示
-    public isTaskDetailModalShow?: boolean;
+  export default defineComponent({
+    props: {
+      // タスク表示/非表示
+      isTaskDetailModalShow: {
+        type: Boolean
+      },
+      // タスクのステータス
+      taskStatus: {
+        type: String
+      },
+      priorities: {
+        type: Array
+      },
+      // 選択されたタスク
+      selectedTask: {
+        type: Object as () => TaskData
+      },
+      // ステータス{key: i18n}
+      statuses: {
+        type: Object
+      }
+    },
+    setup(props, { emit }){
+      const state = reactive<{ task: TaskData }>({
+        task: {}
+      })
 
-    @Prop()
-    // タスクのステータス
-    public taskStatus?: string;
+      // TODO:あとで必要か確認
+      const menu2 = ref<Boolean>( false )
 
-    @Prop()
-    // タスクの優先度のenum
-    public priorities?: object[];
+     // タスク名のバリデーション
+      const nameRules =  [
+        (v: string) => !!v || 'タスク名は必須です',
+        (v: string) => v.length <= 50 || 'タスク名は50字以内で入力してください',
+      ]
 
-    @Prop()
-    // 選択されたタスク
-    public selectedTask?: TaskData;
+      // 詳細のバリデーション
+      const detailRules = [
+        (v: string) => v?.length <= 200 || !v || '詳細は200字以内で入力してください'
+      ]
 
-    @Prop()
-    // ステータス{key: i18n}
-    public statuses?: object;
+      // 登録されているタスクを取得する
+      const onClickSave = (selectedTask: TaskData): void => {
+        state.task.status = props.taskStatus;
+        emit('on-click-task-detail-save', selectedTask);
+      }
 
-    public task: TaskData = {};
+      const cancelTaskDetail = () => {
+        emit('on-click-task-detail-cancel')
+      }
 
-    // TODO:あとで必要か確認
-    public menu2: boolean = false;
-
-    @Emit('on-click-task-detail-save')
-    public onClickTaskDetailSaveEmit(selectedTask: TaskData){}
-
-    // タスク名のバリデーション
-    public nameRules =  [
-      (v: string) => !!v || 'タスク名は必須です',
-      (v: string) => v.length <= 50 || 'タスク名は50字以内で入力してください',
-    ]
-
-    // 詳細のバリデーション
-    public detailRules = [
-      (v: string) => v?.length <= 200 || !v || '詳細は200字以内で入力してください'
-    ]
-
-    // 登録されているタスクを取得する
-    public onClickSave(selectedTask: TaskData): void {
-      this.task.status = this.taskStatus;
-      this.onClickTaskDetailSaveEmit(selectedTask);
+      return {
+        menu2,
+        nameRules,
+        detailRules,
+        onClickSave,
+        cancelTaskDetail
+      }
     }
-  }
+  });
 </script>
