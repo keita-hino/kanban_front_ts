@@ -45,6 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
+  import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -78,28 +79,24 @@
 
       // タスク詳細設定用モーダルに渡す用のタスクステータス
       // 登録されているタスクを取得する
-      const getTasks = (): void=> {
-        let workspace_id = getWorkspaceId()
-        context.root.axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
-          .then(response => {
-            state.tasks = response.data.tasks
-            state.priorities = response.data.priorities
-            state.statuses = response.data.statuses
-          });
+      const getTasks = async() => {
+        const workspaceId = getWorkspaceId()
+
+        const response = await fetchTasks(workspaceId)
+
+        state.tasks = response.data.tasks
+        state.priorities = response.data.priorities
+        state.statuses = response.data.statuses
       }
 
       // タスクの新規作成
-      const createTask = (task: TaskData): void =>{
-        let workspace_id = getWorkspaceId()
-        // タスク新規作成
-        context.root.axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id
-        })
-        .then( response => {
-          isTaskTextHide.value = true;
-          state.tasks = response.data.tasks
-        });
+      const createTask = async(task: TaskData) =>{
+        let workspaceId = getWorkspaceId()
+
+        const response = await postTask(task, workspaceId)
+
+        isTaskTextHide.value = true;
+        state.tasks = response.data.tasks
       }
 
       // タスクの詳細設定用モーダルを開く
@@ -115,25 +112,20 @@
       }
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
-      const onClickTaskDetailSave = (task: TaskData): void =>{
+      const onClickTaskDetailSave = async(task: TaskData) =>{
         // ワークスペースID取得
-        let workspace_id = getWorkspaceId()
+        let workspaceId = getWorkspaceId()
 
-        // タスク更新
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          isTaskDetailModalShow.value = false;
-          state.tasks = response.data.tasks
-        });
+        const response = await updateTask(task, workspaceId)
+
+        isTaskDetailModalShow.value = false;
+        state.tasks = response.data.tasks
       }
 
       // 縦に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       // TODO:下記のリファクタリング
-      const onUpdateTaskStatus = (event: EventData): void | string =>{
+      const onUpdateTaskStatus = async(event: EventData) =>{
         // ワークスペースID取得
         let workspace_id = getWorkspaceId()
 
@@ -155,25 +147,20 @@
         movedTask.display_order = oldTask?.display_order
 
         // タスクの並び更新処理
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
-          task: movedTask,
-          old_display_order: movedTask.display_order,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          state.tasks = response.data.tasks
-        });
+        const response = await updateOrderTask(movedTask, workspace_id)
+
+        state.tasks = response.data.tasks
       }
 
       // 横に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-      const draggableEnd = (event: EventData): void | string => {
+      const draggableEnd = async(event: EventData) => {
         if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
           return ''
         }
 
         // ワークスペースID取得
-        let workspace_id = getWorkspaceId()
+        let workspaceId = getWorkspaceId()
 
         // TODO:ロジックのリファクタリング
         let status = event.from.getAttribute('data-column-status')
@@ -195,13 +182,9 @@
         findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
         // タスクの並び更新処理
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
-          task: findedTask,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          state.tasks = response.data.tasks
-        });
+        const response = await updateStatusTask(findedTask, workspaceId)
+
+        state.tasks = response.data.tasks
       }
 
       // ステータスでフィルタリングしたタスクを返す
