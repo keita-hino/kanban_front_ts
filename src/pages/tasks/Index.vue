@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, ref, onMounted } from '@vue/composition-api'
+  import { defineComponent, reactive, ref, computed, onMounted } from '@vue/composition-api'
   import _ from 'lodash'
 
   import { TaskData } from '@/types/task'
@@ -54,6 +54,7 @@
       const isTaskDetailModalShow = ref<Boolean>( false )
       const isTaskTextHide = ref<Boolean>( true )
       const taskStatus = ref<String>( '' );
+      const workspaceId = computed(() => context.root.$store.getters['workspace/id'])
       // TODO: refにできるものは切り出す
       const state = reactive<{tasks: TaskData[], priorities: String[], statuses: Object, selectedTask: TaskData}>({
         tasks: [],
@@ -76,13 +77,10 @@
         })
       });
 
-
       // タスク詳細設定用モーダルに渡す用のタスクステータス
       // 登録されているタスクを取得する
       const getTasks = async() => {
-        const workspaceId = getWorkspaceId()
-
-        const response = await fetchTasks(workspaceId)
+        const response = await fetchTasks(workspaceId.value)
 
         state.tasks = response.data.tasks
         state.priorities = response.data.priorities
@@ -91,9 +89,7 @@
 
       // タスクの新規作成
       const createTask = async(task: TaskData) =>{
-        let workspaceId = getWorkspaceId()
-
-        const response = await postTask(task, workspaceId)
+        const response = await postTask(task, workspaceId.value)
 
         isTaskTextHide.value = true;
         state.tasks = response.data.tasks
@@ -113,10 +109,7 @@
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
       const onClickTaskDetailSave = async(task: TaskData) =>{
-        // ワークスペースID取得
-        let workspaceId = getWorkspaceId()
-
-        const response = await updateTask(task, workspaceId)
+        const response = await updateTask(task, workspaceId.value)
 
         isTaskDetailModalShow.value = false;
         state.tasks = response.data.tasks
@@ -126,9 +119,6 @@
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       // TODO:下記のリファクタリング
       const onUpdateTaskStatus = async(event: EventData) =>{
-        // ワークスペースID取得
-        let workspace_id = getWorkspaceId()
-
         // 該当のレーン上のタスク取得
         const status = event.from.getAttribute('data-column-status')
         let filteredTasks = state.tasks.filter( task => task.status == status )
@@ -147,7 +137,7 @@
         movedTask.display_order = oldTask?.display_order
 
         // タスクの並び更新処理
-        const response = await updateOrderTask(movedTask, workspace_id)
+        const response = await updateOrderTask(movedTask, workspaceId.value)
 
         state.tasks = response.data.tasks
       }
@@ -158,9 +148,6 @@
         if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
           return ''
         }
-
-        // ワークスペースID取得
-        let workspaceId = getWorkspaceId()
 
         // TODO:ロジックのリファクタリング
         let status = event.from.getAttribute('data-column-status')
@@ -182,7 +169,7 @@
         findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
         // タスクの並び更新処理
-        const response = await updateStatusTask(findedTask, workspaceId)
+        const response = await updateStatusTask(findedTask, workspaceId.value)
 
         state.tasks = response.data.tasks
       }
@@ -190,11 +177,6 @@
       // ステータスでフィルタリングしたタスクを返す
       const filteredTasks = (key: string): TaskData[] =>{
         return state.tasks.filter( task => task.status == key )
-      }
-
-      // ストアからワークスペースIDを取得する
-      const getWorkspaceId = (): number =>{
-        return context.root.$store.getters['workspace/id']
       }
 
       return{
