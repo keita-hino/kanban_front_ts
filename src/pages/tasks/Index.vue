@@ -45,7 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
-  import { fetchTasks, postTask, updateTask, updateOrderTask } from '@/api/task'
+  import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -154,13 +154,13 @@
 
       // 横に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-      const draggableEnd = (event: EventData): void | string => {
+      const draggableEnd = async(event: EventData) => {
         if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
           return ''
         }
 
         // ワークスペースID取得
-        let workspace_id = getWorkspaceId()
+        let workspaceId = getWorkspaceId()
 
         // TODO:ロジックのリファクタリング
         let status = event.from.getAttribute('data-column-status')
@@ -182,13 +182,9 @@
         findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
         // タスクの並び更新処理
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/update_status_task`, {
-          task: findedTask,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          state.tasks = response.data.tasks
-        });
+        const response = await updateStatusTask(findedTask, workspaceId)
+
+        state.tasks = response.data.tasks
       }
 
       // ステータスでフィルタリングしたタスクを返す
