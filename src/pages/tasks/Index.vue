@@ -45,7 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
-  import { fetchTasks, postTask, updateTask } from '@/api/task'
+  import { fetchTasks, postTask, updateTask, updateOrderTask } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -125,7 +125,7 @@
       // 縦に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       // TODO:下記のリファクタリング
-      const onUpdateTaskStatus = (event: EventData): void | string =>{
+      const onUpdateTaskStatus = async(event: EventData) =>{
         // ワークスペースID取得
         let workspace_id = getWorkspaceId()
 
@@ -147,14 +147,9 @@
         movedTask.display_order = oldTask?.display_order
 
         // タスクの並び更新処理
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
-          task: movedTask,
-          old_display_order: movedTask.display_order,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          state.tasks = response.data.tasks
-        });
+        const response = await updateOrderTask(movedTask, workspace_id)
+
+        state.tasks = response.data.tasks
       }
 
       // 横に移動した時に発火

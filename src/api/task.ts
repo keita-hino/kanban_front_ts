@@ -26,3 +26,9 @@ export const updateTask = async (task: TaskData, workspaceId: Number) => await a
   task: task,
   workspace_id: workspaceId
 });
+
+export const updateOrderTask = async (movedTask: TaskData, workspaceId: Number) => await axios.patch<responseTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks/moved_tasks`, {
+  task: movedTask,
+  old_display_order: movedTask.display_order,
+  workspace_id: workspaceId,
+});
