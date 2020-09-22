@@ -1,23 +1,28 @@
 import axios from 'axios'
 import { TaskData } from '@/types/task'
 
-export type responseTasks = {
+export type responseFetchTasks = {
   tasks: TaskData[];
   priorities: String[];
   statuses: Object;
 };
 
-export type responseCreatedTasks = {
+export type responseTasks = {
   tasks: TaskData[]
 }
 
-export const fetchTasks = async (workspace_id: Number) => await axios.get<responseTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+export const fetchTasks = async (workspaceId: Number) => await axios.get<responseFetchTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
   params: {
-    workspace_id: workspace_id
+    workspace_id: workspaceId
   }}
 );
 
-export const postTask = async (task: TaskData, workspace_id: Number) => await axios.post<responseCreatedTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+export const postTask = async (task: TaskData, workspaceId: Number) => await axios.post<responseTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
   task: task,
-  workspace_id: workspace_id
+  workspace_id: workspaceId
+});
+
+export const updateTask = async (task: TaskData, workspaceId: Number) => await axios.patch<responseTasks>(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
+  task: task,
+  workspace_id: workspaceId
 });

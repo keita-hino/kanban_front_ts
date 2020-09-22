@@ -45,7 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
-  import { fetchTasks, postTask } from '@/api/task'
+  import { fetchTasks, postTask, updateTask } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -112,19 +112,14 @@
       }
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
-      const onClickTaskDetailSave = (task: TaskData): void =>{
+      const onClickTaskDetailSave = async(task: TaskData) =>{
         // ワークスペースID取得
-        let workspace_id = getWorkspaceId()
+        let workspaceId = getWorkspaceId()
 
-        // タスク更新
-        context.root.axios.patch(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id,
-        })
-        .then( response => {
-          isTaskDetailModalShow.value = false;
-          state.tasks = response.data.tasks
-        });
+        const response = await updateTask(task, workspaceId)
+
+        isTaskDetailModalShow.value = false;
+        state.tasks = response.data.tasks
       }
 
       // 縦に移動した時に発火
