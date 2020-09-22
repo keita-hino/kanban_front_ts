@@ -27,6 +27,7 @@
             required
             Flat
             dense
+            :autofocus="true"
           ></v-text-field>
         </v-card-text>
 
@@ -90,7 +91,7 @@
       // キャンセルボタンが押された時
       const onClickCansel = (): void =>{
         state.task = {};
-        emit('close');
+        emit('on-click-cancel');
       }
 
       const showTextShow = (): void => {
