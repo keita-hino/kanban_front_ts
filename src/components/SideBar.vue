@@ -80,8 +80,8 @@
         context.root.$store.commit('workspace/setWorkspace', workspace);
       }
 
-      const imageUrl = (image_url: String) => {
-        return `${process.env.VUE_APP_BASE_URL}/${image_url}`
+      const imageUrl = (url: String) => {
+        return `${process.env.VUE_APP_BASE_URL}/${url}`
       }
 
       return {

@@ -14,7 +14,7 @@
 
       <!-- プロフィール周り -->
       <v-menu offset-y>
-        <template  v-if="isLogined()" v-slot:activator="{ on }">
+        <template v-if="isLogined()" v-slot:activator="{ on }">
           <a v-on="on" class="profile-menu">
             <!-- TODO:後にプロフィール画像にする -->
             {{ fullName() }}
@@ -43,7 +43,7 @@
     <UserProfileModal
       @on-click-modal-cancel="onClickModalCancel"
       @update-user="onClickUpdateUser"
-      :is-profile-modal-show="is_profile_modal_show"
+      :is-profile-modal-show="isProfileModalShow"
       :user="state.user"
     />
 
@@ -69,7 +69,7 @@
       })
 
       const drawer = ref<boolean>( false )
-      const is_profile_modal_show = ref<boolean>( false )
+      const isProfileModalShow = ref<boolean>( false )
 
       // ログアウトボタン押下時
       const onClickLogout = () => {
@@ -79,14 +79,14 @@
 
       // ユーザ設定モーダルでキャンセルボタンが押された時
       const onClickModalCancel = () => {
-        is_profile_modal_show.value = false;
+        isProfileModalShow.value = false;
       }
 
       // ユーザ設定モーダルで更新ボタンが押された時
       const onClickUpdateUser = async (user: UserData) =>  {
         const response = await updateUser(state.user)
 
-        is_profile_modal_show.value = false;
+        isProfileModalShow.value = false;
         context.root.$store.commit('auth/logout');
         context.root.$router.push({name: 'Login'})
       }
@@ -103,13 +103,13 @@
 
       // プロファイル設定モーダルを開く
       const onProfileModalOpen = () => {
-        is_profile_modal_show.value = true;
+        isProfileModalShow.value = true;
         state.user = _.cloneDeep(context.root.$store.state.auth)
       }
 
       return {
         state,
-        is_profile_modal_show,
+        isProfileModalShow,
         drawer,
         onClickLogout,
         onClickModalCancel,

@@ -8,7 +8,7 @@
         @on-click-text-show="onClickTextShow"
         @on-click-cancel="onClickCansel"
         @on-click-create-task="onClickCreateTask"
-        :is-task-text-hide="is_task_text_hide"
+        :is-task-text-hide="isTaskTextHide"
         :status-key="statusKey"
       />
 
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, ref } from '@vue/composition-api'
+  import { defineComponent, ref } from '@vue/composition-api'
   import { TaskData } from '@/types/task'
 
   import draggable from 'vuedraggable'
@@ -62,10 +62,7 @@
       }
     },
     setup(props, { emit }){
-      const is_task_text_hide = ref<Boolean>( true )
-      const state = reactive<{ task: TaskData }>({
-        task: {}
-      })
+      const isTaskTextHide = ref<Boolean>( true )
 
       // タスクの更新
       const onUpdateTaskStatus = (event: Event): void =>  {
@@ -90,24 +87,23 @@
 
       // タスクの新規作成
       const onClickCreateTask = (task: TaskData, statusKey: string): void =>  {
-        is_task_text_hide.value = true;
+        isTaskTextHide.value = true;
         task.status = statusKey;
         emit('create-task', task);
       }
 
       // キャンセルボタンが押された時
       const onClickCansel = (): void => {
-        is_task_text_hide.value = true;
+        isTaskTextHide.value = true;
       }
 
       // タスク追加が押された時
       const onClickTextShow = (): void => {
-        is_task_text_hide.value = false;
+        isTaskTextHide.value = false;
       }
 
       return {
-        state,
-        is_task_text_hide,
+        isTaskTextHide,
         options,
         onClickTextShow,
         onClickCansel,
