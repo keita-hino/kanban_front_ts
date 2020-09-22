@@ -45,6 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
+  import { fetchTasks } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -78,14 +79,14 @@
 
       // タスク詳細設定用モーダルに渡す用のタスクステータス
       // 登録されているタスクを取得する
-      const getTasks = (): void=> {
-        let workspace_id = getWorkspaceId()
-        context.root.axios.get(`${process.env.VUE_APP_API_BASE_URL}/tasks`, { params: {workspace_id: workspace_id} })
-          .then(response => {
-            state.tasks = response.data.tasks
-            state.priorities = response.data.priorities
-            state.statuses = response.data.statuses
-          });
+      const getTasks = async() => {
+        const workspaceId = getWorkspaceId()
+
+        const response = await fetchTasks(workspaceId)
+
+        state.tasks = response.data.tasks
+        state.priorities = response.data.priorities
+        state.statuses = response.data.statuses
       }
 
       // タスクの新規作成
