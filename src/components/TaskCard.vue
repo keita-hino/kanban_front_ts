@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, ref } from '@vue/composition-api'
+  import { defineComponent, ref } from '@vue/composition-api'
   import { TaskData } from '@/types/task'
 
   import draggable from 'vuedraggable'
@@ -63,9 +63,6 @@
     },
     setup(props, { emit }){
       const isTaskTextHide = ref<Boolean>( true )
-      const state = reactive<{ task: TaskData }>({
-        task: {}
-      })
 
       // タスクの更新
       const onUpdateTaskStatus = (event: Event): void =>  {
@@ -106,7 +103,6 @@
       }
 
       return {
-        state,
         isTaskTextHide,
         options,
         onClickTextShow,
