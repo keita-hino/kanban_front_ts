@@ -27,6 +27,7 @@
             required
             Flat
             dense
+            :autofocus="true"
           ></v-text-field>
         </v-card-text>
 
