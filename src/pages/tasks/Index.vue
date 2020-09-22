@@ -17,7 +17,7 @@
             :tasks="filteredTasks(key)"
             @on-update-task-status="onUpdateTaskStatus"
             @on-draggable-end="draggableEnd"
-            @on-detail-modal-open="onDetailModalOpen"
+            @on-detail-modal-open="onClickDetailModalOpen"
             @create-task="createTask"
           />
         </template>
@@ -26,8 +26,8 @@
       <TaskDetailModal
         @on-click-task-detail-cancel="onClickTaskDetailCancel"
         @on-click-task-detail-save="onClickTaskDetailSave"
-        :is-task-detail-modal-show.sync="is_task_detail_modal_show"
-        :task-status="task_status"
+        :is-task-detail-modal-show.sync="isTaskDetailModalShow"
+        :task-status="taskStatus"
         :priorities="state.priorities"
         :selected-task="state.selectedTask"
         :statuses="state.statuses"
@@ -50,9 +50,9 @@
     components: { TaskCard, TaskDetailModal },
     setup(_props, context){
       const priorities = ref<String[]>( [] )
-      const is_task_detail_modal_show = ref<Boolean>( false )
-      const is_task_text_hide = ref<Boolean>( true )
-      const task_status = ref<String>( '' );
+      const isTaskDetailModalShow = ref<Boolean>( false )
+      const isTaskTextHide = ref<Boolean>( true )
+      const taskStatus = ref<String>( '' );
       // TODO: refにできるものは切り出す
       const state = reactive<{tasks: TaskData[], priorities: String[], statuses: Object, selectedTask: TaskData}>({
         tasks: [],
@@ -97,21 +97,21 @@
           workspace_id: workspace_id
         })
         .then( response => {
-          is_task_text_hide.value = true;
+          isTaskTextHide.value = true;
           state.tasks = response.data.tasks
         });
       }
 
       // タスクの詳細設定用モーダルを開く
-      const onDetailModalOpen = (task: TaskData): void =>{
+      const onClickDetailModalOpen = (task: TaskData): void =>{
         state.selectedTask = _.cloneDeep(task)
-        task_status.value = status;
-        is_task_detail_modal_show.value = true;
+        taskStatus.value = status;
+        isTaskDetailModalShow.value = true;
       }
 
       // タスク詳細モーダルでキャンセルボタンが押された時
       const onClickTaskDetailCancel = (): void =>{
-        is_task_detail_modal_show.value = false;
+        isTaskDetailModalShow.value = false;
       }
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
@@ -125,7 +125,7 @@
           workspace_id: workspace_id,
         })
         .then( response => {
-          is_task_detail_modal_show.value = false;
+          isTaskDetailModalShow.value = false;
           state.tasks = response.data.tasks
         });
       }
@@ -216,14 +216,14 @@
 
       return{
         state,
-        is_task_detail_modal_show,
-        task_status,
-        onClickTaskDetailCancel,
-        onClickTaskDetailSave,
+        isTaskDetailModalShow,
+        taskStatus,
         filteredTasks,
         onUpdateTaskStatus,
         draggableEnd,
-        onDetailModalOpen,
+        onClickTaskDetailCancel,
+        onClickTaskDetailSave,
+        onClickDetailModalOpen,
         createTask
       }
     }
