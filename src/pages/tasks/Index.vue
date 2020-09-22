@@ -45,7 +45,7 @@
   import { EventData } from '@/types/event'
   import TaskCard from '@/components/TaskCard.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
-  import { fetchTasks } from '@/api/task'
+  import { fetchTasks, postTask } from '@/api/task'
 
   export default defineComponent({
     components: { TaskCard, TaskDetailModal },
@@ -90,17 +90,13 @@
       }
 
       // タスクの新規作成
-      const createTask = (task: TaskData): void =>{
-        let workspace_id = getWorkspaceId()
-        // タスク新規作成
-        context.root.axios.post(`${process.env.VUE_APP_API_BASE_URL}/tasks`, {
-          task: task,
-          workspace_id: workspace_id
-        })
-        .then( response => {
-          isTaskTextHide.value = true;
-          state.tasks = response.data.tasks
-        });
+      const createTask = async(task: TaskData) =>{
+        let workspaceId = getWorkspaceId()
+
+        const response = await postTask(task, workspaceId)
+
+        isTaskTextHide.value = true;
+        state.tasks = response.data.tasks
       }
 
       // タスクの詳細設定用モーダルを開く
