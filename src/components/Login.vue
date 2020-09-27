@@ -52,7 +52,6 @@
 
 <script lang="ts">
   import { defineComponent, reactive } from '@vue/composition-api'
-  import { Component, Vue } from 'vue-property-decorator';
   import { UserData } from '@/types/user'
   import { login } from '@/api/auth'
 
