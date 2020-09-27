@@ -54,7 +54,6 @@
 
 <script lang="ts">
   import { defineComponent, ref, reactive, onMounted } from "@vue/composition-api";
-  import { Component, Vue } from 'vue-property-decorator';
   import { WorkspaceData } from '@/types/workspace'
   import { fetchWorkspaces } from '@/api/workspace'
 

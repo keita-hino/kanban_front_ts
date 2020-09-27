@@ -56,7 +56,6 @@
   import { UserData } from '@/types/user'
 
   import { defineComponent, reactive, ref } from '@vue/composition-api'
-  import { Component, Vue } from 'vue-property-decorator';
   import UserProfileModal from './UserProfileModal.vue';
   import { updateUser} from '@/api/user'
 
