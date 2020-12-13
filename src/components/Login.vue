@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-card
         class="mx-auto"
@@ -47,7 +47,7 @@
       </v-card>
 
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script lang="ts">
