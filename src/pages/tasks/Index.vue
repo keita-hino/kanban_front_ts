@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-row
         class="lighten-4"
@@ -34,7 +34,7 @@
       />
 
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script lang="ts">
