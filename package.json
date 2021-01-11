@@ -14,7 +14,7 @@
     "@types/lodash": "^4.14.152",
     "@types/vuedraggable": "^2.23.1",
     "@vue/composition-api": "^1.0.0-beta.10",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "babel-loader": "7",
     "babel-preset-env": "^1.7.0",
     "core-js": "^3.6.4",
