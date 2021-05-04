@@ -34,27 +34,25 @@
       }
     },
 
-    setup(props, context){      
+    setup(props, { emit }){      
       const createTask = async(task: TaskData) =>{
-        context.emit('create-task', task);
+        emit('create-task', task);
       }
 
-      const onClickDetailModalOpen = (task: TaskData): void =>{
-        context.emit('on-detail-modal-open', task);
+      const onClickDetailModalOpen = (task: TaskData) =>{
+        emit('on-detail-modal-open', task);
       }
 
-      const onUpdateTaskStatus = (event: Event): void =>  {
-        context.emit('on-update-task-status', event)
+      const onUpdateTaskStatus = (event: Event) =>  {
+        emit('on-update-task-status', event)
       }
 
-      const draggableEnd = (event: Event): void => {
-        context.emit('on-draggable-end', event);
+      const draggableEnd = (event: Event) => {
+        emit('on-draggable-end', event);
       }
 
       // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): TaskData[] =>{
-        return props.tasks.filter( task => task.status == key )
-      }
+      const filteredTasks = (key: string): TaskData[] => props.tasks.filter( task => task.status == key );
 
       return{
         filteredTasks,
