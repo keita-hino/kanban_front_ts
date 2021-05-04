@@ -61,11 +61,11 @@
         type: Array as () => TaskData[]
       }
     },
-    setup(props, { emit }){
-      const isTaskTextHide = ref<Boolean>( true )
+    setup(_, { emit }){
+      const isTaskTextHide = ref(true)
 
       // タスクの更新
-      const onUpdateTaskStatus = (event: Event): void =>  {
+      const onUpdateTaskStatus = (event: Event) =>  {
         emit('on-update-task-status', event)
       }
 
@@ -76,29 +76,29 @@
       }
 
       // 横に移動した時に発火
-      const draggableEnd = (event: Event): void => {
+      const draggableEnd = (event: Event) => {
         emit('on-draggable-end', event);
       }
 
       // 詳細モーダルを開く
-      const onDetailModalOpen = (task: TaskData): void => {
+      const onDetailModalOpen = (task: TaskData) => {
         emit('on-detail-modal-open', task);
       }
 
       // タスクの新規作成
-      const onClickCreateTask = (task: TaskData, statusKey: string): void =>  {
+      const onClickCreateTask = (task: TaskData, statusKey: string) =>  {
         isTaskTextHide.value = true;
         task.status = statusKey;
         emit('create-task', task);
       }
 
       // キャンセルボタンが押された時
-      const onClickCansel = (): void => {
+      const onClickCansel = () => {
         isTaskTextHide.value = true;
       }
 
       // タスク追加が押された時
-      const onClickTextShow = (): void => {
+      const onClickTextShow = () => {
         isTaskTextHide.value = false;
       }
 

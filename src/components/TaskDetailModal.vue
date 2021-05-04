@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, ref } from '@vue/composition-api'
+  import { defineComponent, ref } from '@vue/composition-api'
   import { TaskData } from '@/types/task';
 
   export default defineComponent({
@@ -105,12 +105,10 @@
       }
     },
     setup(props, { emit }){
-      const state = reactive<{ task: TaskData }>({
-        task: {}
-      })
+      const task = ref<TaskData>({})
 
       // TODO:あとで必要か確認
-      const menu2 = ref<Boolean>( false )
+      const menu2 = ref(false)
 
      // タスク名のバリデーション
       const nameRules =  [
@@ -124,8 +122,8 @@
       ]
 
       // 登録されているタスクを取得する
-      const onClickSave = (selectedTask: TaskData): void => {
-        state.task.status = props.taskStatus;
+      const onClickSave = (selectedTask: TaskData) => {
+        task.value.status = props.taskStatus;
         emit('on-click-task-detail-save', selectedTask);
       }
 

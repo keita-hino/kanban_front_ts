@@ -3,8 +3,8 @@ import { TaskData } from '@/types/task'
 
 export type responseFetchTasks = {
   tasks: TaskData[];
-  priorities: String[];
-  statuses: Object;
+  priorities: string[];
+  statuses: object;
 };
 
 export type responseTasks = {
