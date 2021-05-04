@@ -29,7 +29,7 @@
 
             <v-list-item-action>
               <v-avatar
-                v-for="workspace in state.workspaces" :key="workspace.id"
+                v-for="workspace in workspaces" :key="workspace.id"
                 size="36"
                 :tile="true"
                 class="mb-4 avator"
@@ -53,38 +53,34 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, reactive, onMounted } from "@vue/composition-api";
+  import { defineComponent, ref, onMounted } from "@vue/composition-api";
   import { WorkspaceData } from '@/types/workspace'
   import { fetchWorkspaces } from '@/api/workspace'
 
   export default defineComponent ({
-    setup(_props, context) {
+    setup(_, { root }) {
       onMounted(() => {
         getWorkspaces();
       })
 
-      const state = reactive<{ workspaces: WorkspaceData[] }>({
-        workspaces: []
-      });
+      const workspaces = ref<WorkspaceData[]>([])
 
       // ユーザーが所属しているワークスペースを取得する
       const getWorkspaces = async () => {
-        const response = await fetchWorkspaces(context.root.$store.state.auth.email)
+        const response = await fetchWorkspaces(root.$store.state.auth.email)
 
-        state.workspaces = response.data.workspaces
+        workspaces.value = response.data.workspaces
       }
 
       // ワークスペースが選択された時
       const onClickWorkspace = (workspace: Object) => {
-        context.root.$store.commit('workspace/setWorkspace', workspace);
+        root.$store.commit('workspace/setWorkspace', workspace);
       }
 
-      const imageUrl = (url: String) => {
-        return `${process.env.VUE_APP_BASE_URL}/${url}`
-      }
+      const imageUrl = (url: String) => `${process.env.VUE_APP_BASE_URL}/${url}`;
 
       return {
-        state,
+        workspaces,
         onClickWorkspace,
         imageUrl,
       };

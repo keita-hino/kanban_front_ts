@@ -15,7 +15,7 @@
           <v-row>
             <v-col cols="11" class="ml-5">
               <v-text-field
-                v-model="state.user.email"
+                v-model="user.email"
                 append-icon="person"
                 name="login"
                 label="メールアドレス"
@@ -26,7 +26,7 @@
             </v-col>
             <v-col cols="11" class="ml-5">
               <v-text-field
-                v-model="state.user.password"
+                v-model="user.password"
                 append-icon="lock"
                 name="password"
                 label="パスワード"
@@ -51,30 +51,28 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive } from '@vue/composition-api'
+  import { defineComponent, ref } from '@vue/composition-api'
   import { UserData } from '@/types/user'
   import { login } from '@/api/auth'
 
   export default defineComponent({
-    setup(_props, context){
-      const state = reactive<{ user: UserData }>({
-        user: {}
-      })
+    setup(_, { root }){
+      const user = ref<UserData>({})
 
       const onClicklogin = async () => {
-        const response = await login(state.user)
+        const response = await login(user.value)
 
         // TODO:ログイン失敗した場合の処理追加
         const data = {
           user: response.data.data
         }
-        context.root.$store.commit('auth/login', data.user);
-        context.root.$store.commit('workspace/setWorkspace', response.data.workspace);
-        context.root.$router.push({name: 'Tasks'});
+        root.$store.commit('auth/login', data.user);
+        root.$store.commit('workspace/setWorkspace', response.data.workspace);
+        root.$router.push({name: 'Tasks'});
       }
 
       return {
-        state,
+        user,
         onClicklogin
       }
     }

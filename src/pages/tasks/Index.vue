@@ -8,29 +8,23 @@
         <div id="top" class='headline font-italic font-weight-light mt-2 mb-7'>{{ $store.getters['workspace/name'] }}</div>
       </v-row>
 
-      <div class='d-flex'>
-        <template v-for="(status, key) in state.statuses">
-          <TaskCard
-            :key="key"
-            :sub-title="status"
-            :status-key="key"
-            :tasks="filteredTasks(key)"
-            @on-update-task-status="onUpdateTaskStatus"
-            @on-draggable-end="draggableEnd"
-            @on-detail-modal-open="onClickDetailModalOpen"
-            @create-task="createTask"
-          />
-        </template>
-      </div>
+      <TaskCards
+        :statuses="statuses"
+        :tasks="tasks"
+        @on-update-task-status="onUpdateTaskStatus"
+        @on-draggable-end="draggableEnd"
+        @on-detail-modal-open="onClickDetailModalOpen"
+        @create-task="createTask"
+      />
 
       <TaskDetailModal
         @on-click-task-detail-cancel="onClickTaskDetailCancel"
         @on-click-task-detail-save="onClickTaskDetailSave"
         :is-task-detail-modal-show.sync="isTaskDetailModalShow"
         :task-status="taskStatus"
-        :priorities="state.priorities"
-        :selected-task="state.selectedTask"
-        :statuses="state.statuses"
+        :priorities="priorities"
+        :selected-task="selectedTask"
+        :statuses="statuses"
       />
 
     </v-container>
@@ -38,39 +32,35 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, ref, computed, onMounted } from '@vue/composition-api'
+  import { defineComponent, ref, computed, onMounted } from '@vue/composition-api'
   import _ from 'lodash'
 
   import { TaskData } from '@/types/task'
   import { EventData } from '@/types/event'
-  import TaskCard from '@/components/TaskCard.vue'
+  import TaskCards from '@/components/TaskCards.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
   import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
 
   export default defineComponent({
-    components: { TaskCard, TaskDetailModal },
-    setup(_props, context){
-      const priorities = ref<String[]>( [] )
-      const isTaskDetailModalShow = ref<Boolean>( false )
-      const isTaskTextHide = ref<Boolean>( true )
-      const taskStatus = ref<String>( '' );
-      const workspaceId = computed(() => context.root.$store.getters['workspace/id'])
-      // TODO: refにできるものは切り出す
-      const state = reactive<{tasks: TaskData[], priorities: String[], statuses: Object, selectedTask: TaskData}>({
-        tasks: [],
-        priorities: [],
-        statuses: {},
-        selectedTask: {}
-      });
+    components: { TaskCards, TaskDetailModal },
+    setup(_props, { root }){
+      const isTaskDetailModalShow = ref(false)
+      const taskStatus = ref('');
+      const workspaceId = computed(() => root.$store.getters['workspace/id'])
+      const tasks = ref<TaskData[]>([]);
+      const priorities = ref<string[]>([])
+      const statuses = ref({})
+      const selectedTask = ref<TaskData>({})
+      
 
       onMounted(() => {
         getTasks();
         // TODO:ここは共通でできるようにする
-        if(context.root.$store.state.auth.email == null && context.root.$route.name != 'Login'){
-          context.root.$router.push({name: 'Login'})
+        if(root.$store.state.auth.email == null && root.$route.name != 'Login'){
+          root.$router.push({name: 'Login'})
         }
         // ワークスペースが変更されたら再度Taskを取得する
-        context.root.$store.subscribe((mutation) => {
+        root.$store.subscribe((mutation) => {
           if (mutation.type === 'workspace/setWorkspace') {
             getTasks();
           }
@@ -82,46 +72,45 @@
       const getTasks = async() => {
         const response = await fetchTasks(workspaceId.value)
 
-        state.tasks = response.data.tasks
-        state.priorities = response.data.priorities
-        state.statuses = response.data.statuses
+        tasks.value = response.data.tasks
+        priorities.value = response.data.priorities
+        statuses.value = response.data.statuses
       }
 
       // タスクの新規作成
-      const createTask = async(task: TaskData) =>{
+      const createTask = async(task: TaskData) => {
         const response = await postTask(task, workspaceId.value)
 
-        isTaskTextHide.value = true;
-        state.tasks = response.data.tasks
+        tasks.value = response.data.tasks
       }
 
       // タスクの詳細設定用モーダルを開く
-      const onClickDetailModalOpen = (task: TaskData): void =>{
-        state.selectedTask = _.cloneDeep(task)
+      const onClickDetailModalOpen = (task: TaskData) => {
+        selectedTask.value = _.cloneDeep(task)
         taskStatus.value = status;
         isTaskDetailModalShow.value = true;
       }
 
       // タスク詳細モーダルでキャンセルボタンが押された時
-      const onClickTaskDetailCancel = (): void =>{
+      const onClickTaskDetailCancel = () => {
         isTaskDetailModalShow.value = false;
       }
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
-      const onClickTaskDetailSave = async(task: TaskData) =>{
+      const onClickTaskDetailSave = async(task: TaskData) => {
         const response = await updateTask(task, workspaceId.value)
 
         isTaskDetailModalShow.value = false;
-        state.tasks = response.data.tasks
+        tasks.value = response.data.tasks
       }
 
       // 縦に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       // TODO:下記のリファクタリング
-      const onUpdateTaskStatus = async(event: EventData) =>{
+      const onUpdateTaskStatus = async(event: EventData) => {
         // 該当のレーン上のタスク取得
         const status = event.from.getAttribute('data-column-status')
-        let filteredTasks = state.tasks.filter( task => task.status == status )
+        let filteredTasks = tasks.value.filter( task => task.status == status )
 
         // 移動するタスク取得
         let movedTask = filteredTasks.find( (task,index) => index == event.oldIndex )
@@ -129,9 +118,7 @@
         // 挿入した位置の直下にあるタスク取得
         let oldTask = filteredTasks.find( (task,index) => index == event.newIndex )
 
-        if (!movedTask) {
-          return ''
-        }
+        if (!movedTask) { return '' }
 
         // 挿入先のdisplay_order設定
         movedTask.display_order = oldTask?.display_order
@@ -139,48 +126,43 @@
         // タスクの並び更新処理
         const response = await updateOrderTask(movedTask, workspaceId.value)
 
-        state.tasks = response.data.tasks
+        tasks.value = response.data.tasks
       }
 
       // 横に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       const draggableEnd = async(event: EventData) => {
-        if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){
-          return ''
-        }
+        if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){ return '' }
 
         // TODO:ロジックのリファクタリング
         let status = event.from.getAttribute('data-column-status')
-        let filteredTasks = state.tasks.filter( task => task.status == status )
+        let filteredTasks = tasks.value.filter( task => task.status == status )
         let findedTask = filteredTasks.find( (task, index) => index == event.oldIndex )
-        if(!findedTask){
-          return ''
-        }
+        if(!findedTask){ return '' }
 
         findedTask.status = event.to.getAttribute('data-column-status')
 
         // 挿入した位置の直下にあるタスクのdisplay_order取得
         let oldStatus = event.to.getAttribute('data-column-status')
-        let findOldTasks = state.tasks.filter( task => task.status == oldStatus )
-        if(!findOldTasks){
-          return ''
-        }
+        let findOldTasks = tasks.value.filter( task => task.status == oldStatus )
+        if(!findOldTasks){ return '' }
 
         findedTask.display_order = findOldTasks?.find( (task, index) => index == event.newIndex )?.display_order
 
         // タスクの並び更新処理
         const response = await updateStatusTask(findedTask, workspaceId.value)
 
-        state.tasks = response.data.tasks
+        tasks.value = response.data.tasks
       }
 
       // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): TaskData[] =>{
-        return state.tasks.filter( task => task.status == key )
-      }
+      const filteredTasks = (key: string): TaskData[] => tasks.value.filter( task => task.status == key );
 
       return{
-        state,
+        tasks,
+        priorities,
+        statuses,
+        selectedTask,
         isTaskDetailModalShow,
         taskStatus,
         filteredTasks,
