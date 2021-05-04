@@ -8,20 +8,14 @@
         <div id="top" class='headline font-italic font-weight-light mt-2 mb-7'>{{ $store.getters['workspace/name'] }}</div>
       </v-row>
 
-      <div class='d-flex'>
-        <template v-for="(status, key) in state.statuses">
-          <TaskCard
-            :key="key"
-            :sub-title="status"
-            :status-key="key"
-            :tasks="filteredTasks(key)"
-            @on-update-task-status="onUpdateTaskStatus"
-            @on-draggable-end="draggableEnd"
-            @on-detail-modal-open="onClickDetailModalOpen"
-            @create-task="createTask"
-          />
-        </template>
-      </div>
+      <TaskCards
+        :statuses="state.statuses"
+        :tasks="state.tasks"
+        @on-update-task-status="onUpdateTaskStatus"
+        @on-draggable-end="draggableEnd"
+        @on-detail-modal-open="onClickDetailModalOpen"
+        @create-task="createTask"
+      />
 
       <TaskDetailModal
         @on-click-task-detail-cancel="onClickTaskDetailCancel"
@@ -43,12 +37,12 @@
 
   import { TaskData } from '@/types/task'
   import { EventData } from '@/types/event'
-  import TaskCard from '@/components/TaskCard.vue'
+  import TaskCards from '@/components/TaskCards.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
   import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
 
   export default defineComponent({
-    components: { TaskCard, TaskDetailModal },
+    components: { TaskCards, TaskDetailModal },
     setup(_props, context){
       const priorities = ref<String[]>( [] )
       const isTaskDetailModalShow = ref<Boolean>( false )
