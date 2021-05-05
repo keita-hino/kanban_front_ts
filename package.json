@@ -35,6 +35,7 @@
     "websocket-extensions": "0.1.4"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "@vue/cli-plugin-router": "^4.3.0",
     "@vue/cli-plugin-typescript": "^4.3.0",
     "@vue/cli-plugin-vuex": "^4.3.0",
@@ -47,6 +48,7 @@
     "node-sass": "~4.14.1",
     "sass": "^1.19.0",
     "sass-loader": "^8.0.0",
+    "ts-jest": "^26.5.5",
     "typescript": "~3.8.3",
     "vue-cli-plugin-vuetify": "^2.0.5",
     "vue-jest": "^3.0.5",
@@ -61,11 +63,14 @@
   "jest": {
     "moduleFileExtensions": [
       "js",
+      "ts",
       "json",
       "vue"
     ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "transform": {
       ".*\\.(vue)$": "vue-jest",
+      "^.+\\.ts?$": "ts-jest",
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
     }
   },
