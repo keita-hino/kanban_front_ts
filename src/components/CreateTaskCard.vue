@@ -6,9 +6,21 @@
         class="mt-2"
         width="330"
       >
-        <v-card-text @click="showTextShow()" class="text-center" style="cursor: pointer">
-          <v-icon class="mr-1 mb-1" color="blue lighten-2" size=15>add</v-icon>
-          <span class="blue--text lighten-2--text subheading mr-2">タスク追加</span>
+        <v-card-text 
+          class="text-center" 
+          style="cursor: pointer"
+          @click="showTextShow" 
+        >
+          <v-icon 
+            class="mr-1 mb-1" 
+            color="blue lighten-2" 
+            size=15
+          >add
+          </v-icon>
+          <span 
+            class="blue--text lighten-2--text subheading mr-2"
+          >タスク追加
+          </span>
         </v-card-text>
       </v-card>
     </template>
@@ -19,7 +31,7 @@
       >
         <v-card-text class="pb-0">
           <v-text-field
-            v-model="state.task.name"
+            v-model="task.name"
             label="タスク名"
             outlined
             :counter="50"
@@ -35,11 +47,21 @@
           <v-spacer></v-spacer>
 
           <div class="my-2 pr-3">
-            <v-btn small @click="onClickCansel()">キャンセル</v-btn>
+            <v-btn 
+              small 
+              @click="onClickCansel"
+            >キャンセル
+            </v-btn>
           </div>
 
           <div class="my-2 pr-2">
-            <v-btn small @click="onClickCreateTask()" :disabled="!state.task.name" color="primary">作成</v-btn>
+            <v-btn 
+              small 
+              @click="onClickCreateTask" 
+              :disabled="!task.name" 
+              color="primary"
+            >作成
+            </v-btn>
           </div>
         </v-card-actions>
       </v-card>
@@ -48,7 +70,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, watch } from '@vue/composition-api'
+  import { defineComponent, ref, watch } from '@vue/composition-api'
   import { TaskData } from '@/types/task'
 
   export default defineComponent({
@@ -64,18 +86,7 @@
     },
 
     setup(props, { emit }){
-      watch(
-        () => props.isTaskTextHide,
-        () => {
-          if(!props.isTaskTextHide) {
-            init()
-          }
-        }
-      )
-
-      const state = reactive<{ task: TaskData }>({
-        task: {}
-      });
+      const task = ref<TaskData>({});
 
       // タスク名のバリデーション
       const nameRules = [
@@ -84,26 +95,32 @@
       ]
 
       // 初期化処理
-      const init = (): void => {
-        state.task = {};
+      const init = () => {
+        task.value = {};
       }
 
       // キャンセルボタンが押された時
-      const onClickCansel = (): void =>{
-        state.task = {};
+      const onClickCansel = () =>{
+        init();
         emit('on-click-cancel');
       }
 
-      const showTextShow = (): void => {
+      const showTextShow = () => {
         emit('on-click-text-show');
       }
 
-      const onClickCreateTask = (): void => {
-        emit('on-click-create-task', state.task, props.statusKey)
+      const onClickCreateTask = () => {
+        emit('on-click-create-task', task.value, props.statusKey)
       }
 
+      watch(() => props.isTaskTextHide, () => {
+        if(!props.isTaskTextHide) {
+          init();
+        }
+      });
+
       return {
-        state,
+        task,
         nameRules,
         props,
         onClickCansel,
