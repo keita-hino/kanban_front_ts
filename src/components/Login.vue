@@ -52,12 +52,12 @@
 
 <script lang="ts">
   import { defineComponent, ref } from '@vue/composition-api'
-  import { UserData } from '@/types/user'
+  import { User } from '@/types/schema'
   import { login } from '@/api/auth'
 
   export default defineComponent({
     setup(_, { root }){
-      const user = ref<UserData>({})
+      const user = ref<User>({})
 
       const onClicklogin = async () => {
         const response = await login(user.value)

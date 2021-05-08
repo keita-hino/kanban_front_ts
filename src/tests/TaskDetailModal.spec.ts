@@ -6,7 +6,7 @@ import { findDataTest } from './support/vue-test-utils-helper'
 describe('TaskDetailModal', () => {
   const selectedTask = { id: 1, workspace_id: 1, name: "タスク0", detail: "詳細0", status: "unstarted", priority: "low", display_order: 1, due_date: "2019-03-10", created_at: "2020-05-12T11:36:26.838+09:00", updated_at: "2020-05-12T11:36:26.838+09:00" }
 
-  const taskDataProps = {
+  const TaskProps = {
     isTaskDetailModalShow: true,
     taskStatus: 'unstarted',
     priorities: ['low', 'medium', 'high'],
@@ -16,7 +16,7 @@ describe('TaskDetailModal', () => {
 
   const createComponent = () => mount(TaskDetailModal, {
     vuetify: new Vuetify(),
-    propsData: taskDataProps
+    propsData: TaskProps
   })
 
   it('キャンセルボタンが押された時にemitされること', async () => {

@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { WorkspaceData } from '@/types/workspace'
+import { Workspace } from '@/types/schema'
 
 export type responseWorkspaces = {
-  workspaces: WorkspaceData[];
+  workspaces: Workspace[];
 };
 
 export const fetchWorkspaces = async (email: string) => await axios.get<responseWorkspaces>(`${process.env.VUE_APP_API_BASE_URL}/workspaces`, {

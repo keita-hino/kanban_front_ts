@@ -94,7 +94,7 @@
 
 <script lang="ts">
   import { defineComponent, ref } from '@vue/composition-api'
-  import { TaskData } from '@/types/task';
+  import { Task } from '@/types/schema';
 
   export default defineComponent({
     props: {
@@ -111,7 +111,7 @@
       },
       // 選択されたタスク
       selectedTask: {
-        type: Object as () => TaskData
+        type: Object as () => Task
       },
       // ステータス{key: i18n}
       statuses: {
@@ -119,7 +119,7 @@
       }
     },
     setup(props, { emit }){
-      const task = ref<TaskData>({})
+      const task = ref<Task>({})
 
       // TODO:あとで必要か確認
       const menu2 = ref(false)
@@ -136,7 +136,7 @@
       ]
 
       // 登録されているタスクを取得する
-      const onClickSave = (selectedTask: TaskData) => {
+      const onClickSave = (selectedTask: Task) => {
         task.value.status = props.taskStatus;
         emit('on-click-task-detail-save', selectedTask);
       }

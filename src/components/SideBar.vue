@@ -54,7 +54,7 @@
 
 <script lang="ts">
   import { defineComponent, ref, onMounted } from "@vue/composition-api";
-  import { WorkspaceData } from '@/types/workspace'
+  import { Workspace } from '@/types/schema'
   import { fetchWorkspaces } from '@/api/workspace'
 
   export default defineComponent ({
@@ -63,7 +63,7 @@
         getWorkspaces();
       })
 
-      const workspaces = ref<WorkspaceData[]>([])
+      const workspaces = ref<Workspace[]>([])
 
       // ユーザーが所属しているワークスペースを取得する
       const getWorkspaces = async () => {

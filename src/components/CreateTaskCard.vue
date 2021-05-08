@@ -71,7 +71,7 @@
 
 <script lang="ts">
   import { defineComponent, ref, watch } from '@vue/composition-api'
-  import { TaskData } from '@/types/task'
+  import { Task } from '@/types/schema'
 
   export default defineComponent({
     props: {
@@ -86,7 +86,7 @@
     },
 
     setup(props, { emit }){
-      const task = ref<TaskData>({});
+      const task = ref<Task>({});
 
       // タスク名のバリデーション
       const nameRules = [

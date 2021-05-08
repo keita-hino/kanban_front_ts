@@ -42,7 +42,7 @@
 
 <script lang="ts">
   import { defineComponent, ref } from '@vue/composition-api'
-  import { TaskData } from '@/types/task'
+  import { Task } from '@/types/schema'
 
   import draggable from 'vuedraggable'
   import CreateTaskCard from './CreateTaskCard.vue'
@@ -58,7 +58,7 @@
         type: String
       },
       tasks: {
-        type: Array as () => TaskData[]
+        type: Array as () => Task[]
       }
     },
     setup(_, { emit }){
@@ -81,12 +81,12 @@
       }
 
       // 詳細モーダルを開く
-      const onDetailModalOpen = (task: TaskData) => {
+      const onDetailModalOpen = (task: Task) => {
         emit('on-detail-modal-open', task);
       }
 
       // タスクの新規作成
-      const onClickCreateTask = (task: TaskData, statusKey: string) =>  {
+      const onClickCreateTask = (task: Task, statusKey: string) =>  {
         isTaskTextHide.value = true;
         task.status = statusKey;
         emit('create-task', task);

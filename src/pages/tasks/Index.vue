@@ -35,8 +35,8 @@
   import { defineComponent, ref, computed, onMounted } from '@vue/composition-api'
   import _ from 'lodash'
 
-  import { TaskData } from '@/types/task'
-  import { EventData } from '@/types/event'
+  import { Task } from '@/types/schema'
+  import { Event } from '@/types/schema'
   import TaskCards from '@/components/TaskCards.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
   import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
@@ -47,10 +47,10 @@
       const isTaskDetailModalShow = ref(false)
       const taskStatus = ref('');
       const workspaceId = computed(() => root.$store.getters['workspace/id'])
-      const tasks = ref<TaskData[]>([]);
+      const tasks = ref<Task[]>([]);
       const priorities = ref<string[]>([])
       const statuses = ref({})
-      const selectedTask = ref<TaskData>({})
+      const selectedTask = ref<Task>({})
       
 
       onMounted(() => {
@@ -78,14 +78,14 @@
       }
 
       // タスクの新規作成
-      const createTask = async(task: TaskData) => {
+      const createTask = async(task: Task) => {
         const response = await postTask(task, workspaceId.value)
 
         tasks.value = response.data.tasks
       }
 
       // タスクの詳細設定用モーダルを開く
-      const onClickDetailModalOpen = (task: TaskData) => {
+      const onClickDetailModalOpen = (task: Task) => {
         selectedTask.value = _.cloneDeep(task)
         taskStatus.value = status;
         isTaskDetailModalShow.value = true;
@@ -97,7 +97,7 @@
       }
 
       // タスク詳細設定用モーダルで保存ボタンが押された時
-      const onClickTaskDetailSave = async(task: TaskData) => {
+      const onClickTaskDetailSave = async(task: Task) => {
         const response = await updateTask(task, workspaceId.value)
 
         isTaskDetailModalShow.value = false;
@@ -107,7 +107,7 @@
       // 縦に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
       // TODO:下記のリファクタリング
-      const onUpdateTaskStatus = async(event: EventData) => {
+      const onUpdateTaskStatus = async(event: Event) => {
         // 該当のレーン上のタスク取得
         const status = event.from.getAttribute('data-column-status')
         let filteredTasks = tasks.value.filter( task => task.status == status )
@@ -131,7 +131,7 @@
 
       // 横に移動した時に発火
       // TODO:コンポーネント側にロジックを移動してtaskを受け取るだけにする
-      const draggableEnd = async(event: EventData) => {
+      const draggableEnd = async(event: Event) => {
         if(event.from.getAttribute('data-column-status') == event.to.getAttribute('data-column-status')){ return '' }
 
         // TODO:ロジックのリファクタリング
@@ -156,7 +156,7 @@
       }
 
       // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): TaskData[] => tasks.value.filter( task => task.status == key );
+      const filteredTasks = (key: string): Task[] => tasks.value.filter( task => task.status == key );
 
       return{
         tasks,

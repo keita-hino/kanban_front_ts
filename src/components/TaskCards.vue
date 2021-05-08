@@ -18,7 +18,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from '@vue/composition-api'
   
-  import { TaskData } from '@/types/task'
+  import { Task } from '@/types/schema'
   import TaskCard from '@/components/TaskCard.vue'
   
   export default defineComponent({
@@ -29,17 +29,17 @@
         required: true
       },
       tasks: {
-        type: Array as PropType<TaskData[]>,
+        type: Array as PropType<Task[]>,
         required: true
       }
     },
 
     setup(props, { emit }){      
-      const createTask = async(task: TaskData) =>{
+      const createTask = async(task: Task) =>{
         emit('create-task', task);
       }
 
-      const onClickDetailModalOpen = (task: TaskData) =>{
+      const onClickDetailModalOpen = (task: Task) =>{
         emit('on-detail-modal-open', task);
       }
 
@@ -52,7 +52,7 @@
       }
 
       // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): TaskData[] => props.tasks.filter( task => task.status == key );
+      const filteredTasks = (key: string): Task[] => props.tasks.filter( task => task.status == key );
 
       return{
         filteredTasks,
