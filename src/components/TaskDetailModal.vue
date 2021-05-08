@@ -70,8 +70,22 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="cancelTaskDetail()">キャンセル</v-btn>
-          <v-btn class="save" color="blue darken-1" text @click="onClickSave(selectedTask)" :disabled="!!$refs.task_form && !$refs.task_form.validate()">保存</v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            data-test="task-detail-modal-cancel-btn"
+            @click="cancelTaskDetail()"
+            >キャンセル
+          </v-btn>
+          <v-btn 
+            class="save"
+            color="blue darken-1"
+            text
+            data-test="task-detail-modal-save-btn"
+            @click="onClickSave(selectedTask)" 
+            :disabled="!!$refs.task_form && !$refs.task_form.validate()"
+            >保存
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
