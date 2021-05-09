@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from '@vue/composition-api'
+  import { defineComponent, ref, PropType } from '@vue/composition-api'
   import { Task } from '@/types/schema'
 
   import draggable from 'vuedraggable'
@@ -58,7 +58,7 @@
         type: String
       },
       tasks: {
-        type: Array as () => Task[]
+        type: Array as PropType<Task[]>
       }
     },
     setup(_, { emit }){

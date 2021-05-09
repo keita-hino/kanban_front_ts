@@ -29,7 +29,8 @@
 
             <v-list-item-action>
               <v-avatar
-                v-for="workspace in workspaces" :key="workspace.id"
+                v-for="workspace in workspaces"
+                :key="workspace.id"
                 size="36"
                 :tile="true"
                 class="mb-4 avator"
