@@ -35,8 +35,7 @@
   import { defineComponent, ref, computed, onMounted } from '@vue/composition-api'
   import _ from 'lodash'
 
-  import { Task } from '@/types/schema'
-  import { Event } from '@/types/schema'
+  import { Task, Event } from '@/types/schema'
   import TaskCards from '@/components/TaskCards.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
   import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
