@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, reactive, watch } from '@vue/composition-api'
+  import { defineComponent, watch, PropType } from '@vue/composition-api'
   import { User } from '@/types/schema'
 
   export default defineComponent({
@@ -65,7 +65,7 @@
       },
       // ログイン中のユーザ
       user: {
-        type: Object as () => User
+        type: Object as PropType<User>
       },
     },
     setup(props, { emit }){
@@ -96,12 +96,12 @@
         (v: string) => v.length <= 20 || 'メールアドレスは20字以内で入力してください',
       ]
 
-      const init = (): void => {
+      const init = () => {
         !!props.user ? props.user.before_email = props?.user?.email : ""
       }
 
       // 変更ボタンが押された時
-      const onClickUpdateUser = (user: User): void =>{
+      const onClickUpdateUser = (user: User) => {
         emit('update-user', user)
       }
 
