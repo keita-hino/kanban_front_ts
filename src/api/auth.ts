@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { User } from '@/types/schema'
-import { Workspace } from '@/types/schema'
+import { User, Workspace } from '@/types/schema'
 
 export type LoginResponse = {
   data: string;
