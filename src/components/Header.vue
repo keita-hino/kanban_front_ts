@@ -83,7 +83,7 @@
 
       // ユーザ設定モーダルで更新ボタンが押された時
       const onClickUpdateUser = async (user: User) =>  {
-        const response = await updateUser(state.user)
+        await updateUser(state.user)
 
         isProfileModalShow.value = false;
         context.root.$store.commit('auth/logout');
@@ -91,14 +91,10 @@
       }
 
       // フルネーム取得
-      const fullName = () => {
-        return `${context.root.$store.state.auth.last_name} ${context.root.$store.state.auth.first_name}`
-      }
+      const fullName = () => `${context.root.$store.state.auth.last_name} ${context.root.$store.state.auth.first_name}`;
 
       // ログインしているか
-      const isLogined = () => {
-        return context.root.$store.state.auth.email != null
-      }
+      const isLogined = () => context.root.$store.state.auth.email != null;
 
       // プロファイル設定モーダルを開く
       const onProfileModalOpen = () => {
@@ -117,7 +113,6 @@
         isLogined,
         onProfileModalOpen
       }
-
     }
   })
 </script>
