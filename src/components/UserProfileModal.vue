@@ -55,7 +55,7 @@
 
 <script lang="ts">
   import { defineComponent, reactive, watch } from '@vue/composition-api'
-  import { UserData } from '@/types/user'
+  import { User } from '@/types/schema'
 
   export default defineComponent({
     props: {
@@ -65,7 +65,7 @@
       },
       // ログイン中のユーザ
       user: {
-        type: Object as () => UserData
+        type: Object as () => User
       },
     },
     setup(props, { emit }){
@@ -101,7 +101,7 @@
       }
 
       // 変更ボタンが押された時
-      const onClickUpdateUser = (user: UserData): void =>{
+      const onClickUpdateUser = (user: User): void =>{
         emit('update-user', user)
       }
 

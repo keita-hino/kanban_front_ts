@@ -53,7 +53,7 @@
 <script lang="ts">
   import _ from 'lodash';
 
-  import { UserData } from '@/types/user'
+  import { User } from '@/types/schema'
 
   import { defineComponent, reactive, ref } from '@vue/composition-api'
   import UserProfileModal from './UserProfileModal.vue';
@@ -63,7 +63,7 @@
     components: { UserProfileModal},
 
     setup(_props, context){
-      const state = reactive<{ user: UserData }>({
+      const state = reactive<{ user: User }>({
         user: {}
       })
 
@@ -82,7 +82,7 @@
       }
 
       // ユーザ設定モーダルで更新ボタンが押された時
-      const onClickUpdateUser = async (user: UserData) =>  {
+      const onClickUpdateUser = async (user: User) =>  {
         const response = await updateUser(state.user)
 
         isProfileModalShow.value = false;

@@ -1,10 +1,10 @@
 import axios from 'axios'
-import { UserData } from '@/types/user'
-import { WorkspaceData } from '@/types/workspace'
+import { User } from '@/types/schema'
+import { Workspace } from '@/types/schema'
 
-export type responseLogin = {
+export type LoginResponse = {
   data: string;
-  workspace: WorkspaceData;
+  workspace: Workspace;
 };
 
-export const login = async (user: UserData) => await axios.post<responseLogin>(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, user);
+export const login = async (user: User) => await axios.post<LoginResponse>(`${process.env.VUE_APP_API_BASE_URL}/auth/sign_in`, user);
