@@ -1,43 +1,41 @@
 <template>
   <v-app id="inspire">
-    <template v-if="!isLogined()">
+    <template v-if="isLogined">
+      <SideBar>
+        <Header/>
+        <div class="container">
+          <router-view/>
+        </div>
+      </SideBar>
+    </template>
+
+    <template else>
       <Header/>
       <div class="container">
         <router-view/>
       </div>
     </template>
-
-    <SideBar v-else-if="isLogined()">
-      <Header/>
-      <div class="container">
-        <router-view/>
-      </div>
-    </SideBar>
   </v-app>
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+  import { defineComponent, computed, onMounted } from "@vue/composition-api";
 
   import Header from '@/components/Header.vue'
   import SideBar from '@/components/SideBar.vue'
 
-  @Component({
-    components: {
-      Header,
-      SideBar
+  export default defineComponent({
+    components: { Header, SideBar },
+
+    setup(_, { root }){
+      onMounted(() => {
+        if(root.$store.state.auth.email == null && root.$route.name != 'Login'){
+          root.$router.push({name: 'Login'})
+        }
+      })
+      const isLogined = computed(() => root.$store.state.auth.email != null);
+
+      return { isLogined }      
     }
   })
-
-  export default class App extends Vue {
-    isLogined() {
-      return this.$store.state.auth.email != null
-    }
-
-    mounted(){
-      if(this.$store.state.auth.email == null && this.$route.name != 'Login'){
-        this.$router.push({name: 'Login'})
-      }
-    }
-  }
 </script>
