@@ -73,7 +73,7 @@
       }
 
       // ワークスペースが選択された時
-      const onClickWorkspace = (workspace: Object) => {
+      const onClickWorkspace = (workspace: Workspace) => {
         root.$store.commit('workspace/setWorkspace', workspace);
       }
 

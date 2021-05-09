@@ -52,7 +52,7 @@
       }
 
       // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): Task[] => props.tasks.filter( task => task.status == key );
+      const filteredTasks = (key: string) => props.tasks.filter( task => task.status == key );
 
       return{
         filteredTasks,
