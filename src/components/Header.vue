@@ -14,10 +14,10 @@
 
       <!-- プロフィール周り -->
       <v-menu offset-y>
-        <template v-if="isLogined()" v-slot:activator="{ on }">
+        <template v-if="isLogined" v-slot:activator="{ on }">
           <a v-on="on" class="profile-menu">
             <!-- TODO:後にプロフィール画像にする -->
-            {{ fullName() }}
+            {{ fullName }}
             <i class="v-icon profile-menu notranslate hidden-sm-and-down mdi mdi-menu-down theme--light"></i>
           </a>
         </template>
@@ -29,7 +29,7 @@
         </v-list>
       </v-menu>
 
-    <v-tooltip v-if="isLogined()" bottom>
+    <v-tooltip v-if="isLogined" bottom>
       <template v-slot:activator="{ on }">
         <div v-on="on">
           <v-btn icon @click="onClickLogout">
@@ -55,7 +55,7 @@
 
   import { User } from '@/types/schema'
 
-  import { defineComponent, reactive, ref } from '@vue/composition-api'
+  import { defineComponent, reactive, ref, computed } from '@vue/composition-api'
   import UserProfileModal from './UserProfileModal.vue';
   import { updateUser} from '@/api/user'
 
@@ -91,10 +91,10 @@
       }
 
       // フルネーム取得
-      const fullName = () => `${context.root.$store.state.auth.last_name} ${context.root.$store.state.auth.first_name}`;
+      const fullName = computed(() => `${context.root.$store.state.auth.last_name} ${context.root.$store.state.auth.first_name}`);
 
       // ログインしているか
-      const isLogined = () => context.root.$store.state.auth.email != null;
+      const isLogined = computed(() => context.root.$store.state.auth.email != null);
 
       // プロファイル設定モーダルを開く
       const onProfileModalOpen = () => {
