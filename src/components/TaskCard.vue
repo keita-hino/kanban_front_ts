@@ -32,7 +32,11 @@
             <p class="subtitle-2 text--primary">
               {{ task.name }}
             </p>
-            <span v-if="!!task.due_date">Due {{ task.due_date }}</span>
+            <span 
+              v-if="!!task.due_date"
+              :class="{ 'red--text': hasExpired(task)}"
+            >Due {{ task.due_date }}
+            </span>
           </v-card-text>
         </v-card>
       </draggable>
@@ -63,6 +67,9 @@
     },
     setup(_, { emit }){
       const isTaskTextHide = ref(true)
+      
+      // FIXME: 毎回newするとコストが大きいので、なんとかしたい
+      const hasExpired = (task: Task) => task.due_date && new Date(task.due_date) < new Date();
 
       // タスクの更新
       const onUpdateTaskStatus = (event: Event) =>  {
@@ -107,6 +114,7 @@
         options,
         onClickTextShow,
         onClickCansel,
+        hasExpired,
         onClickCreateTask,
         onUpdateTaskStatus,
         draggableEnd,
