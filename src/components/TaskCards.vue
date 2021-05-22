@@ -19,13 +19,14 @@
   import { defineComponent, PropType } from '@vue/composition-api'
   
   import { Task } from '@/types/schema'
+  import { Statuses } from 'src/api/task';
   import TaskCard from '@/components/TaskCard.vue'
   
   export default defineComponent({
     components: { TaskCard },
     props: {
       statuses: {
-        type: Object,
+        type: Object as PropType<Statuses>,
         required: true
       },
       tasks: {
