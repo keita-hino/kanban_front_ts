@@ -36,6 +36,7 @@
   import _ from 'lodash'
 
   import { Task, Event } from '@/types/schema'
+  import { Statuses, Priorities } from 'src/api/task';
   import TaskCards from '@/components/TaskCards.vue'
   import TaskDetailModal from '@/components/TaskDetailModal.vue'
   import { fetchTasks, postTask, updateTask, updateOrderTask, updateStatusTask } from '@/api/task'
@@ -47,10 +48,9 @@
       const taskStatus = ref('');
       const workspaceId = computed(() => root.$store.getters['workspace/id'])
       const tasks = ref<Task[]>([]);
-      const priorities = ref<string[]>([])
-      const statuses = ref({})
+      const priorities = ref<Priorities>([])
+      const statuses = ref<Statuses>({})
       const selectedTask = ref<Task>({})
-      
 
       onMounted(() => {
         getTasks();
@@ -154,9 +154,6 @@
         tasks.value = response.data.tasks
       }
 
-      // ステータスでフィルタリングしたタスクを返す
-      const filteredTasks = (key: string): Task[] => tasks.value.filter( task => task.status == key );
-
       return{
         tasks,
         priorities,
@@ -164,7 +161,6 @@
         selectedTask,
         isTaskDetailModalShow,
         taskStatus,
-        filteredTasks,
         onUpdateTaskStatus,
         draggableEnd,
         onClickTaskDetailCancel,

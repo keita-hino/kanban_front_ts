@@ -93,8 +93,9 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from '@vue/composition-api'
+  import { defineComponent, ref, PropType } from '@vue/composition-api'
   import { Task } from '@/types/schema';
+  import { Statuses, Priorities } from 'src/api/task';
 
   export default defineComponent({
     props: {
@@ -107,15 +108,15 @@
         type: String
       },
       priorities: {
-        type: Array
+        type: Array as PropType<Priorities>
       },
       // 選択されたタスク
       selectedTask: {
-        type: Object as () => Task
+        type: Object as PropType<Task>
       },
       // ステータス{key: i18n}
       statuses: {
-        type: Object
+        type: Object as PropType<Statuses>
       }
     },
     setup(props, { emit }){

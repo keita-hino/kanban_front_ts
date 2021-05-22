@@ -1,10 +1,14 @@
 import axios from 'axios'
 import { Task } from '@/types/schema'
 
+export type Statuses = Record<string, string>;
+export type Priority = "low" | "medium" | "high";
+export type Priorities = Priority[];
+
 export type FetchTasksResponse = {
   tasks: Task[];
-  priorities: string[];
-  statuses: object;
+  priorities: Priorities;
+  statuses: Statuses;
 };
 
 export type TasksResponse = {
