@@ -24,7 +24,7 @@
 
         <v-list tag="a" dense>
           <v-list-item>
-            <v-list-item-title @click="onProfileModalOpen()">プロフィール編集</v-list-item-title>
+            <v-list-item-title @click="onProfileModalOpen">プロフィール編集</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

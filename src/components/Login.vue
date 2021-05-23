@@ -41,7 +41,11 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <div class="my-2 pr-2">
-            <v-btn @click="onClicklogin" small color="primary">ログイン</v-btn>
+            <v-btn 
+              @click="onClicklogin"
+              small
+              color="primary"
+            >ログイン</v-btn>
           </div>
         </v-card-actions>
       </v-card>

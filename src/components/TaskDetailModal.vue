@@ -1,13 +1,17 @@
 <template>
   <div>
-    <v-dialog v-model="isTaskDetailModalShow" persistent max-width="600px">
+    <v-dialog
+      v-model="isTaskDetailModalShow"
+      persistent
+      max-width="600px"
+    >
       <v-card>
         <v-card-title>
           <span class="subtitle-2 font-weight-light">#{{ selectedTask.id }} {{ statuses[selectedTask.status] }}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-form ref="task_form">
+            <v-form ref="taskFormRef">
               <v-row>
                 <v-col cols="12">
                   <v-text-field
@@ -74,7 +78,7 @@
             color="blue darken-1"
             text
             data-test="task-detail-modal-cancel-btn"
-            @click="cancelTaskDetail()"
+            @click="cancelTaskDetail"
             >キャンセル
           </v-btn>
           <v-btn 
@@ -83,7 +87,7 @@
             text
             data-test="task-detail-modal-save-btn"
             @click="onClickSave(selectedTask)" 
-            :disabled="!!$refs.task_form && !$refs.task_form.validate()"
+            :disabled="isInvalid"
             >保存
           </v-btn>
         </v-card-actions>
@@ -93,7 +97,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, PropType } from '@vue/composition-api'
+  import { defineComponent, ref, PropType, computed } from '@vue/composition-api'
   import { Task } from '@/types/schema';
   import { Statuses, Priorities } from 'src/api/task';
 
@@ -120,6 +124,8 @@
       }
     },
     setup(props, { emit }){
+      const taskFormRef = ref<HTMLFormElement | null>(null)
+      const isInvalid = computed(() => taskFormRef.value && !taskFormRef.value.validate())
       const task = ref<Task>({})
 
       // TODO:あとで必要か確認
@@ -147,6 +153,8 @@
       }
 
       return {
+        taskFormRef,
+        isInvalid,
         menu2,
         nameRules,
         detailRules,
