@@ -1,0 +1,3 @@
+[functions]
+  directory = "functions"
+  commands="npm run functions-build"
